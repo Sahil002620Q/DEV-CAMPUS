@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Campus",
+    "slug": "campus-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "campus",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0B0F14"
+      }
+    }
+  }
+}
+
