@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ────────────────────────────────────────────
+    // Helper functions
+    // ────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && userRole() == "super_admin";
+    }
+
+    function isCafeteriaAdmin() {
+      return isSignedIn() && (userRole() == "cafeteria_admin" || userRole() == "super_admin");
+    }
+
+    function isLibraryAdmin() {
+      return isSignedIn() && (userRole() == "library_admin" || userRole() == "super_admin");
+    }
+
+    // ────────────────────────────────────────────
+    // Users collection
+    // ────────────────────────────────────────────
+    match /users/{uid} {
+      // Users can read their own doc; super_admin can read all
+      allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
+
+      // Only super_admin can change the role field
+      allow update: if isSignedIn() && (
+        // Own user can update non-role fields
+        (request.auth.uid == uid && !("role" in request.resource.data.diff(resource.data).affectedKeys()))
+        ||
+        // Super admin can update anything
+        isSuperAdmin()
+      );
+
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if isSuperAdmin();
+    }
+
+    // ────────────────────────────────────────────
+    // Admin roles audit log
+    // ────────────────────────────────────────────
+    match /admin_roles/{uid} {
+      allow read: if isSuperAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ────────────────────────────────────────────
+    // Cafeteria menu
+    // ────────────────────────────────────────────
+    match /cafeteria_menu/{itemId} {
+      // All signed-in users can read the menu
+      allow read: if isSignedIn();
+      // Only cafeteria_admin or super_admin can write
+      allow create, update, delete: if isCafeteriaAdmin();
+    }
+
+    // ────────────────────────────────────────────
+    // Library
+    // ────────────────────────────────────────────
+    match /library/{resourceId} {
+      // All signed-in users can read library entries
+      allow read: if isSignedIn();
+      // Only library_admin or super_admin can write
+      allow create, update, delete: if isLibraryAdmin();
+    }
+  }
+}

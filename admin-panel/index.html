@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusCore</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --t: background 0.4s ease, color 0.4s ease, border-color 0.4s ease; }
+[data-theme="light"] {
+  --bg:#fdfbf0; --bg2:#faf6e0; --surf:#ffffff; --surf2:#fef9e7; --surf3:#fdf3c0;
+  --bdr:#f0e68c; --bdr2:#e6d44a; --txt:#1a1500; --txt2:#4a3f00; --mut:#9a8a30;
+  --acc:#d4a000; --aglow:rgba(212,160,0,.22); --acc2:#e67e00;
+  --grn:#2d7a3a; --red:#c0392b; --blu:#1a6fa8;
+  --shd:0 4px 24px rgba(180,140,0,.13); --shd2:0 12px 48px rgba(180,140,0,.2);
+  --navbg:#fffde8; --tagbg:#fef3c7; --rip:rgba(212,160,0,.28);
+}
+[data-theme="dark"] {
+  --bg:#000; --bg2:#080808; --surf:#0f0f0f; --surf2:#161616; --surf3:#1e1e1e;
+  --bdr:#2a2a2a; --bdr2:#3a3a3a; --txt:#f5f0d0; --txt2:#c8b850; --mut:#666040;
+  --acc:#f0c000; --aglow:rgba(240,192,0,.18); --acc2:#ff9500;
+  --grn:#39d353; --red:#ff4444; --blu:#4da6ff;
+  --shd:0 4px 24px rgba(0,0,0,.6); --shd2:0 12px 48px rgba(240,192,0,.09);
+  --navbg:#0a0a0a; --tagbg:#1a1800; --rip:rgba(240,192,0,.18);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;transition:var(--t);overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--acc)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes slideR{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+@keyframes bounceIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes dotB{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+@keyframes notifPop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+@keyframes waveBar{0%,100%{height:5px}50%{height:18px}}
+@keyframes rippleA{to{transform:scale(4);opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 var(--aglow)}50%{box-shadow:0 0 0 10px transparent}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+
+.rev{opacity:0;animation:fadeUp .5s ease forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
+.d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.4s}
+
+/* RIPPLE */
+.rh{position:relative;overflow:hidden}
+.rc{position:absolute;border-radius:50%;background:var(--rip);transform:scale(0);animation:rippleA .55s linear;pointer-events:none}
+
+/* LAYOUT */
+.shell{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:252px;min-height:100vh;background:var(--navbg);border-right:1.5px solid var(--bdr);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:var(--t);z-index:50;animation:slideR .5s ease both}
+.logo-w{padding:26px 22px 18px;display:flex;align-items:center;gap:11px;border-bottom:1.5px solid var(--bdr)}
+.logo-mk{width:40px;height:40px;background:var(--acc);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 4px 14px var(--aglow);animation:floatY 3s ease-in-out infinite;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.logo-mk:hover{transform:scale(1.12) rotate(-6deg);box-shadow:0 8px 26px var(--aglow)}
+.logo-t{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;letter-spacing:-.5px}
+.logo-t em{color:var(--acc);font-style:normal}
+.ng{padding:14px 11px 0}
+.nl{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mut);padding:0 11px;margin-bottom:5px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;cursor:pointer;font-size:14px;font-weight:600;color:var(--txt2);position:relative;margin-bottom:2px;transition:background .2s,color .2s,transform .15s;user-select:none}
+.ni:hover{background:var(--surf3);color:var(--txt);transform:translateX(3px)}
+.ni:active{transform:translateX(3px) scale(.97)}
+.ni.active{background:var(--acc);color:#000;box-shadow:0 4px 16px var(--aglow)}
+.ni-ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;animation:bounceIn .4s ease}
+.nbadge.y{background:var(--acc);color:#000}
+.sb-bot{margin-top:auto;padding:14px 11px;border-top:1.5px solid var(--bdr)}
+.upill{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;cursor:pointer;transition:background .2s,transform .2s}
+.upill:hover{background:var(--surf3);transform:scale(1.02)}
+.upill:active{transform:scale(.97)}
+.uava{width:34px;height:34px;border-radius:10px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#000;flex-shrink:0}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* TOPBAR */
+.topbar{background:var(--surf);border-bottom:1.5px solid var(--bdr);padding:13px 26px;display:flex;align-items:center;gap:13px;position:sticky;top:0;z-index:100;transition:var(--t);animation:fadeIn .4s ease}
+.tb-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;flex:1}
+.sbox{display:flex;align-items:center;gap:8px;background:var(--surf2);border:1.5px solid var(--bdr);border-radius:50px;padding:7px 17px;width:230px;cursor:pointer;transition:border-color .2s,box-shadow .2s,width .3s cubic-bezier(.4,0,.2,1);font-size:13px;color:var(--mut);font-family:'Nunito',sans-serif}
+.sbox:hover{border-color:var(--acc);box-shadow:0 0 0 3px var(--aglow);width:270px}
+.sbox:active{transform:scale(.98)}
+.tb-icons{display:flex;gap:7px;align-items:center}
+.ibtn{width:37px;height:37px;border-radius:11px;background:var(--surf2);border:1.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;position:relative;transition:background .2s,transform .15s,box-shadow .2s,border-color .2s;user-select:none}
+.ibtn:hover{background:var(--surf3);border-color:var(--acc);transform:translateY(-2px);box-shadow:0 4px 14px var(--aglow)}
+.ibtn:active{transform:translateY(0) scale(.91)}
+.ndot{position:absolute;top:5px;right:5px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--surf);animation:notifPop .3s ease,pulse 2s ease-in-out infinite 1s}
+.ttog{width:50px;height:27px;background:var(--surf3);border:1.5px solid var(--bdr2);border-radius:99px;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}
+.ttog:hover{box-shadow:0 0 0 3px var(--aglow)}
+.tknob{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--acc);transition:transform .3s cubic-bezier(.4,0,.2,1),background .3s;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+[data-theme="dark"] .tknob{transform:translateX(23px)}
+
+/* CONTENT */
+.content{padding:26px;flex:1;overflow-y:auto}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .32s ease both}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.st{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+.sa{font-size:12px;color:var(--acc);font-weight:700;cursor:pointer;padding:3px 11px;border-radius:99px;border:1.5px solid var(--acc);transition:background .2s,transform .15s}
+.sa:hover{background:var(--acc);color:#000;transform:scale(1.04)}
+.sa:active{transform:scale(.96)}
+
+/* BANNER */
+.banner{border-radius:17px;padding:16px 20px;display:flex;align-items:center;gap:15px;margin-bottom:26px;border:1.5px solid var(--bdr2);position:relative;overflow:hidden;animation:slideL .5s ease both}
+[data-theme="light"] .banner{background:linear-gradient(120deg,#fffde7,#fff9c4 60%,#fff3e0)}
+[data-theme="dark"]  .banner{background:linear-gradient(120deg,#1a1500,#201c00 60%,#1a0f00)}
+.banner::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--aglow),transparent);background-size:200% 100%;animation:shimmer 3s linear infinite;pointer-events:none;border-radius:17px}
+.ban-ico{font-size:30px;animation:floatY 2.5s ease-in-out infinite}
+.ban-t strong{font-size:14px;font-weight:800;color:var(--acc);display:block}
+.ban-t span{font-size:13px;color:var(--txt2)}
+.ban-x{margin-left:auto;cursor:pointer;font-size:17px;color:var(--mut);transition:transform .2s,color .2s;z-index:1}
+.ban-x:hover{transform:rotate(90deg);color:var(--red)}
+
+/* STAT CARDS */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:26px}
+.sc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:17px;padding:17px;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--acc);transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.sc:hover{transform:translateY(-4px);box-shadow:var(--shd2);border-color:var(--acc)}
+.sc:hover::before{transform:scaleX(1)}
+.sc:active{transform:translateY(-2px) scale(.98)}
+.si{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:11px}
+.sv{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1;margin-bottom:3px}
+.sl{font-size:12px;color:var(--mut);font-weight:600}
+.sbg{position:absolute;top:13px;right:13px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+
+/* CARD */
+.card{background:var(--surf);border:1.5px solid var(--bdr);border-radius:17px;padding:19px;transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shd);border-color:var(--bdr2)}
+.card:active{transform:scale(.98)}
+
+/* FEED CARD */
+.fc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:17px;margin-bottom:13px;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer}
+.fc:hover{transform:translateY(-3px);box-shadow:var(--shd);border-color:var(--bdr2)}
+.fc:active{transform:scale(.99)}
+.fch{padding:13px 17px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--bdr)}
+.fcb{padding:13px 17px}
+.fct{font-size:14px;font-weight:700;margin-bottom:4px}
+.fcs{font-size:13px;color:var(--txt2);line-height:1.5}
+.fcf{padding:9px 17px;border-top:1.5px solid var(--bdr);display:flex;gap:7px}
+
+/* TAGS */
+.tag{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;gap:3px;transition:transform .15s}
+.tag:hover{transform:scale(1.06)}
+.tex{background:rgba(192,57,43,.12);color:var(--red);border:1px solid rgba(192,57,43,.25)}
+.tho{background:rgba(45,122,58,.12);color:var(--grn);border:1px solid rgba(45,122,58,.25)}
+.tev{background:var(--tagbg);color:var(--acc);border:1px solid var(--bdr2)}
+.tur{background:rgba(230,126,0,.12);color:var(--acc2);border:1px solid rgba(230,126,0,.3)}
+
+/* BUTTONS */
+.btn{padding:9px 19px;border-radius:11px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:transform .15s,box-shadow .2s,background .2s;position:relative;overflow:hidden;user-select:none}
+.btn:active{transform:scale(.93)}
+.btp{background:var(--acc);color:#000;box-shadow:0 4px 14px var(--aglow)}
+.btp:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--aglow)}
+.btg{background:transparent;color:var(--txt2);border:1.5px solid var(--bdr2)}
+.btg:hover{background:var(--surf3);border-color:var(--acc);color:var(--acc);transform:translateY(-1px)}
+.bts{padding:5px 13px;font-size:12px;border-radius:9px}
+.rb{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:99px;font-size:12px;font-weight:700;background:var(--surf2);border:1.5px solid var(--bdr);cursor:pointer;color:var(--txt2);transition:all .2s}
+.rb:hover{border-color:var(--acc);color:var(--acc);transform:scale(1.05)}
+.rb:active{transform:scale(.94)}
+.rb.on{background:var(--tagbg);border-color:var(--acc);color:var(--acc)}
+
+/* FOOD CARDS */
+.food{background:var(--surf);border:1.5px solid var(--bdr);border-radius:17px;overflow:hidden;cursor:pointer;transition:transform .25s cubic-bezier(.4,0,.2,1),box-shadow .25s,border-color .2s}
+.food:hover{transform:translateY(-5px) scale(1.01);box-shadow:var(--shd2);border-color:var(--acc)}
+.food:active{transform:scale(.97)}
+.ft{height:108px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;transition:transform .3s}
+.food:hover .ft{transform:scale(1.1) rotate(-3deg)}
+.fav{position:absolute;top:9px;right:9px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:800}
+.avy{background:rgba(45,122,58,.9);color:#fff}
+.avn{background:rgba(192,57,43,.9);color:#fff}
+.fb{padding:11px 13px}
+.fn{font-size:14px;font-weight:700;margin-bottom:2px}
+.fp{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--acc)}
+.stars{color:var(--acc);font-size:12px}
+.rc2{font-size:11px;color:var(--mut)}
+
+/* LINK CARDS */
+.lc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:17px;padding:19px 15px;display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;cursor:pointer;transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .22s,border-color .2s}
+.lc:hover{transform:translateY(-5px);box-shadow:var(--shd);border-color:var(--acc)}
+.lc:active{transform:scale(.94)}
+.lico{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:23px;transition:transform .25s,box-shadow .25s}
+.lc:hover .lico{transform:rotate(-8deg) scale(1.15);box-shadow:0 6px 18px var(--aglow)}
+.ln{font-size:13px;font-weight:700}
+.lu{font-size:10px;color:var(--mut)}
+.la{font-size:15px;color:var(--mut);transition:transform .2s,color .2s}
+.lc:hover .la{transform:translate(2px,-2px);color:var(--acc)}
+
+/* ANON CARDS */
+.ac{background:var(--surf);border:1.5px solid var(--bdr);border-radius:15px;padding:15px;margin-bottom:11px;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.ac:hover{transform:translateY(-2px);border-color:var(--bdr2);box-shadow:var(--shd)}
+.ac:active{transform:scale(.99)}
+.ach{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.aav{width:29px;height:29px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+.aun{font-size:13px;font-weight:700}
+.atm{font-size:11px;color:var(--mut);margin-left:auto}
+.aq{font-size:14px;line-height:1.65;margin-bottom:11px}
+.tans{background:var(--surf2);border:1.5px solid var(--bdr);border-radius:10px;padding:9px 13px;font-size:13px;margin-bottom:11px;line-height:1.5}
+.tal{font-size:11px;font-weight:800;color:var(--grn);margin-bottom:3px}
+
+/* FILTER CHIPS */
+.fr{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:21px}
+.fcp{padding:6px 15px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--bdr2);background:var(--surf);color:var(--txt2);cursor:pointer;transition:all .2s}
+.fcp:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-1px)}
+.fcp:active{transform:scale(.94)}
+.fcp.on{background:var(--acc);color:#000;border-color:var(--acc)}
+
+/* INPUT */
+.inp{width:100%;background:var(--surf2);border:1.5px solid var(--bdr);border-radius:11px;padding:10px 15px;color:var(--txt);font-family:'Nunito',sans-serif;font-size:14px;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--aglow)}
+.inp::placeholder{color:var(--mut)}
+
+/* L&F */
+.lft{display:flex;gap:4px;background:var(--surf2);padding:4px;border-radius:13px;margin-bottom:20px}
+.lftab{flex:1;text-align:center;padding:8px;border-radius:10px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer;transition:all .25s}
+.lftab.on{background:var(--surf);color:var(--txt);box-shadow:var(--shd)}
+.lftab:not(.on):hover{color:var(--txt2);background:var(--surf3)}
+.lfi{background:var(--surf);border:1.5px solid var(--bdr);border-radius:15px;padding:15px;display:flex;gap:13px;margin-bottom:11px;cursor:pointer;transition:all .2s}
+.lfi:hover{border-color:var(--acc);box-shadow:var(--shd);transform:translateX(3px)}
+.lfi:active{transform:scale(.99)}
+.lfic{width:56px;height:56px;border-radius:13px;background:var(--surf2);border:1.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;transition:transform .25s}
+.lfi:hover .lfic{transform:rotate(-5deg) scale(1.08)}
+.lfn{font-size:14px;font-weight:700;margin-bottom:3px}
+.lfd{font-size:12px;color:var(--mut);margin-bottom:7px}
+.lftr{display:flex;flex-wrap:wrap;gap:5px}
+.lft2{padding:3px 9px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:99px;font-size:11px;color:var(--txt2);font-weight:600;transition:background .2s,color .2s}
+.lft2:hover{background:var(--tagbg);color:var(--acc)}
+
+/* NOTICE */
+.noti{display:flex;gap:12px;align-items:flex-start;padding:12px 15px;border-radius:12px;cursor:pointer;transition:background .2s,transform .15s;margin-bottom:3px}
+.noti:hover{background:var(--surf2);transform:translateX(3px)}
+.noti:active{transform:scale(.99)}
+.nott{font-size:14px;font-weight:700;margin-bottom:2px}
+.notm{font-size:12px;color:var(--mut)}
+
+/* ATTEND */
+.atr{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1.5px solid var(--bdr);transition:background .2s;cursor:pointer}
+.atr:last-child{border-bottom:none}
+.atr:hover{background:var(--surf2);border-radius:9px;padding-left:7px}
+.ats{flex:1;font-size:13px;font-weight:600}
+.atbw{width:108px}
+.pb{height:6px;background:var(--surf3);border-radius:99px;overflow:hidden}
+.pf{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.atpc{width:36px;text-align:right;font-size:13px;font-weight:800}
+
+/* LIBRARY */
+.br{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1.5px solid var(--bdr);cursor:pointer;transition:background .2s,transform .15s;border-radius:9px}
+.br:last-child{border-bottom:none}
+.br:hover{background:var(--surf2);padding-left:7px}
+.bico{font-size:28px}
+.bn{font-size:14px;font-weight:700;margin-bottom:2px}
+.bm{font-size:12px;color:var(--mut)}
+.dc{margin-left:auto;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:800;white-space:nowrap;transition:transform .2s}
+.dc:hover{transform:scale(1.06)}
+.dok{background:rgba(45,122,58,.12);color:var(--grn);border:1px solid rgba(45,122,58,.3)}
+.dwn{background:rgba(230,126,0,.12);color:var(--acc2);border:1px solid rgba(230,126,0,.3)}
+.dlate{background:rgba(192,57,43,.12);color:var(--red);border:1px solid rgba(192,57,43,.3);animation:pulse 1.5s ease-in-out infinite}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.mo.open{display:flex}
+.md{background:var(--surf);border:1.5px solid var(--bdr2);border-radius:22px;padding:28px;width:450px;max-width:92vw;animation:bounceIn .28s ease both;box-shadow:var(--shd2)}
+.mdh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mdt{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+.mdc{width:31px;height:31px;border-radius:99px;background:var(--surf2);border:1.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--mut);transition:all .2s}
+.mdc:hover{background:var(--red);color:#fff;transform:rotate(90deg);border-color:var(--red)}
+
+/* TOAST */
+.ts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:9px}
+.toast{background:var(--surf);border:1.5px solid var(--bdr2);border-radius:13px;padding:11px 17px;display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;box-shadow:var(--shd2);min-width:220px;animation:toastIn .28s ease both}
+
+/* DOT LOADER */
+.dl{display:flex;gap:4px;align-items:center;padding:4px 0}
+.dl span{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:dotB 1.2s ease-in-out infinite}
+.dl span:nth-child(2){animation-delay:.15s}.dl span:nth-child(3){animation-delay:.3s}
+
+/* WAVE BARS */
+.wb{display:flex;align-items:center;gap:2px;height:20px}
+.wbr{width:3px;background:var(--acc);border-radius:99px;animation:waveBar .8s ease-in-out infinite}
+.wbr:nth-child(2){animation-delay:.1s}.wbr:nth-child(3){animation-delay:.2s}
+.wbr:nth-child(4){animation-delay:.3s}.wbr:nth-child(5){animation-delay:.4s}
+
+/* MOBILE NAV */
+.mn{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navbg);border-top:1.5px solid var(--bdr);padding:7px 0 18px;z-index:200}
+.mnw{display:flex}
+.mni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 3px;font-size:10px;font-weight:700;color:var(--mut);transition:color .2s,transform .15s;user-select:none}
+.mni:active{transform:scale(.88)}
+.mni.on{color:var(--acc)}
+.mni span{font-size:20px;transition:transform .2s}
+.mni:hover span{transform:translateY(-3px)}
+
+/* FAB */
+.fab{display:none;position:fixed;bottom:78px;right:19px;width:50px;height:50px;background:var(--acc);border-radius:15px;align-items:center;justify-content:center;font-size:21px;cursor:pointer;box-shadow:0 8px 24px var(--aglow);z-index:150;transition:transform .2s,box-shadow .2s;animation:glow 2s ease-in-out infinite}
+.fab:hover{transform:scale(1.1) rotate(10deg);box-shadow:0 12px 32px var(--aglow)}
+.fab:active{transform:scale(.89)}
+
+/* BG blobs */
+.blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;opacity:.04;filter:blur(80px);animation:floatY 6s ease-in-out infinite}
+[data-theme="dark"] .blob{opacity:.06}
+
+/* UTILS */
+.dvd{height:1.5px;background:var(--bdr);margin:14px 0}
+.mb6{margin-bottom:6px}.mb16{margin-bottom:16px}.mb22{margin-bottom:22px}
+.fr2{display:flex;align-items:center;gap:9px}
+.mla{margin-left:auto}
+.tmut{color:var(--mut);font-size:12px}
+.tac{color:var(--acc)}
+.fwb{font-weight:700}
+.fg{margin-bottom:13px}
+.fl{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:5px}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .sidebar{display:none}
+  .mn{display:block}
+  .fab{display:flex}
+  .content{padding:16px 13px 88px}
+  .sr{grid-template-columns:1fr 1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .topbar{padding:11px 14px}
+  .sbox{display:none}
+}
+@media(max-width:560px){
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr}
+  .sr{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- BG BLOBS -->
+<div class="blob" style="width:480px;height:480px;top:-80px;left:-80px;background:#f0c000"></div>
+<div class="blob" style="width:380px;height:380px;bottom:-60px;right:-60px;background:#ff9500;animation-delay:3s"></div>
+
+<!-- TOAST STACK -->
+<div class="ts" id="TS"></div>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginPage" style="min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+  <div style="width:410px;max-width:94vw" class="rev d1">
+    <div style="background:var(--surf);border:1.5px solid var(--bdr2);border-radius:26px;padding:42px 34px;box-shadow:var(--shd2)">
+      <div style="text-align:center;margin-bottom:30px">
+        <div style="width:60px;height:60px;background:var(--acc);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 13px;box-shadow:0 8px 24px var(--aglow);animation:floatY 3s ease-in-out infinite">🎓</div>
+        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Campus<span style="color:var(--acc)">Core</span></div>
+        <div style="font-size:13px;color:var(--mut);margin-top:3px">IK Gujral PTU · Student Portal</div>
+      </div>
+      <div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;display:flex;gap:9px;margin-bottom:22px;font-size:13px;color:var(--txt2)">
+        <span style="font-size:17px;flex-shrink:0">👻</span>
+        <span>Identity hidden by default. You get a <strong>fun random alias</strong> automatically.</span>
+      </div>
+      <div class="fg"><label class="fl">College Roll Number</label><input class="inp" type="text" placeholder="e.g. 12301234" id="rollI"></div>
+      <div class="fg" style="margin-bottom:20px"><label class="fl">Password</label><input class="inp" type="password" placeholder="Your college password" id="passI"></div>
+      <button class="btn btp rh" style="width:100%;justify-content:center;padding:12px" onclick="doLogin(this)" id="loginBtn">Sign In &nbsp;→</button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px">
+        <span style="font-size:12px;color:var(--mut)">☀️</span>
+        <div class="ttog rh" onclick="toggleTheme()"><div class="tknob" id="lknob">☀️</div></div>
+        <span style="font-size:12px;color:var(--mut)">🌙</span>
+      </div>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--mut)">Login issues? Contact your department admin</div>
+    </div>
+    <div style="text-align:center;margin-top:18px;display:flex;justify-content:center;gap:6px;align-items:center">
+      <div class="wb"><div class="wbr"></div><div class="wbr"></div><div class="wbr"></div><div class="wbr"></div><div class="wbr"></div></div>
+      <span style="font-size:11px;color:var(--mut);padding:0 6px">Your campus, your way</span>
+      <div class="wb"><div class="wbr" style="animation-delay:.4s"></div><div class="wbr" style="animation-delay:.3s"></div><div class="wbr" style="animation-delay:.2s"></div><div class="wbr" style="animation-delay:.1s"></div><div class="wbr"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="mainApp" class="shell" style="display:none;position:relative;z-index:1">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo-w">
+      <div class="logo-mk rh" onclick="toast('🎓','CampusCore v1.0')">🎓</div>
+      <div class="logo-t">Campus<em>Core</em></div>
+    </div>
+    <div class="ng">
+      <div class="nl">Main</div>
+      <div class="ni active rh" onclick="goTo(this,'home')"><span class="ni-ico">🏠</span>Home Feed</div>
+      <div class="ni rh" onclick="goTo(this,'notices')"><span class="ni-ico">📋</span>Notice Board<span class="nbadge">3</span></div>
+      <div class="ni rh" onclick="goTo(this,'cafeteria')"><span class="ni-ico">🍽️</span>Cafeteria</div>
+      <div class="ni rh" onclick="goTo(this,'links')"><span class="ni-ico">🔗</span>Quick Links</div>
+    </div>
+    <div class="ng" style="margin-top:4px">
+      <div class="nl">Community</div>
+      <div class="ni rh" onclick="goTo(this,'anon')"><span class="ni-ico">👻</span>AnonAsk<span class="nbadge y">12</span></div>
+      <div class="ni rh" onclick="goTo(this,'lostfound')"><span class="ni-ico">🔍</span>Lost &amp; Found<span class="nbadge">2</span></div>
+    </div>
+    <div class="ng" style="margin-top:4px">
+      <div class="nl">Academic</div>
+      <div class="ni rh" onclick="goTo(this,'attendance')"><span class="ni-ico">✅</span>Attendance</div>
+      <div class="ni rh" onclick="goTo(this,'library')"><span class="ni-ico">📚</span>Library</div>
+    </div>
+    <div class="sb-bot">
+      <div class="upill rh" onclick="toast('⚙️','Profile settings coming soon!')">
+        <div class="uava">🦊</div>
+        <div><div style="font-size:13px;font-weight:700">CosmicFox_204</div><div style="font-size:11px;color:var(--mut)">Roll: 12301234 · CSE-A</div></div>
+        <div style="margin-left:auto;font-size:13px;color:var(--mut)">⚙️</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="tb-title" id="PT">🏠 Home Feed</div>
+      <div class="sbox rh" onclick="openM('mSearch')">🔍<span>Search anything...</span></div>
+      <div class="tb-icons">
+        <div class="ibtn rh" onclick="goTN('lostfound')" title="Lost &amp; Found">🔍</div>
+        <div class="ibtn rh" onclick="openM('mNotif')">🔔<div class="ndot"></div></div>
+        <div class="ttog rh" onclick="toggleTheme()" title="Toggle theme"><div class="tknob" id="aknob">☀️</div></div>
+        <div class="uava rh" style="cursor:pointer;width:35px;height:35px;border-radius:10px" onclick="toast('🦊','That\'s you — CosmicFox_204!')">🦊</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- HOME -->
+      <div id="s-home" class="screen active">
+        <div class="banner rev d1" id="HB">
+          <div class="ban-ico">🎉</div>
+          <div class="ban-t"><strong>Holiday Tomorrow — 20 April</strong><span>College closed for Baisakhi. MST dates unchanged.</span></div>
+          <div class="ban-x rh" onclick="rmBanner()">✕</div>
+        </div>
+        <div class="sr rev d2">
+          <div class="sc rh" onclick="goTN('notices')">
+            <div class="si" style="background:rgba(212,160,0,.15)">📋</div>
+            <div class="sv">5</div><div class="sl">Active Notices</div>
+            <span class="sbg" style="background:rgba(45,122,58,.15);color:var(--grn)">+2 new</span>
+          </div>
+          <div class="sc rh" onclick="goTN('cafeteria')">
+            <div class="si" style="background:rgba(230,126,0,.15)">🍽️</div>
+            <div class="sv">12</div><div class="sl">Menu Items</div>
+            <span class="sbg" style="background:rgba(45,122,58,.15);color:var(--grn)">Open</span>
+          </div>
+          <div class="sc rh" onclick="goTN('lostfound')">
+            <div class="si" style="background:rgba(192,57,43,.12)">🔍</div>
+            <div class="sv">7</div><div class="sl">Lost Items</div>
+            <span class="sbg" style="background:rgba(192,57,43,.12);color:var(--red)">2 open</span>
+          </div>
+          <div class="sc rh" onclick="goTN('attendance')">
+            <div class="si" style="background:rgba(45,122,58,.12)">✅</div>
+            <div class="sv">78%</div><div class="sl">Attendance</div>
+            <span class="sbg" style="background:rgba(45,122,58,.12);color:var(--grn)">Safe</span>
+          </div>
+        </div>
+        <div class="sh rev d3"><div class="st">📰 Campus Feed</div><div class="sa rh" onclick="goTN('notices')">See all →</div></div>
+        <div class="fc rev d4 rh" onclick="openM('mNotice')">
+          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div><div><div style="font-size:13px;font-weight:700">Official Notice</div><div class="tmut" style="margin-top:1px">2 hours ago</div></div><span class="tag tex mla">EXAM</span></div>
+          <div class="fcb"><div class="fct">MST-2 Schedule Released — May 5–9</div><div class="fcs">Engineering Physics MST-2 on May 6, 10 AM–11 AM, Block B. Units 5–8.</div></div>
+          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>34</span></div><div class="rb rh" onclick="event.stopPropagation();toast('❓','Marked as confusing')">❓ Confusing <span>4</span></div></div>
+        </div>
+        <div class="fc rev d5 rh" onclick="goTN('cafeteria')">
+          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(212,160,0,.15)">🔥</div><div><div style="font-size:13px;font-weight:700">Cafeteria Trending</div><div class="tmut" style="margin-top:1px">Today's top rated</div></div><span class="tag tev mla">★ 4.8</span></div>
+          <div class="fcb"><div class="fct">🥪 Veg Sandwich — ₹25</div><div class="fcs">"Fresh and filling — the best thing here." — CosmicFox_204</div></div>
+          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('cafeteria')">🍽️ View Full Menu</div></div>
+        </div>
+        <div class="fc rev d6 rh" onclick="goTN('anon')">
+          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:var(--tagbg)">👻</div><div><div style="font-size:13px;font-weight:700">AnonAsk — Trending</div><div class="tmut" style="margin-top:1px">30 min ago · 8 answers</div></div><span class="tag tev mla">Academic</span></div>
+          <div class="fcb"><div class="fct">"Is Unit 7 (Fibre Optics) in MST-2 or only finals?"</div><div class="fcs">23 upvotes · Community answering anonymously</div></div>
+          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('anon')">Answer anonymously →</div></div>
+        </div>
+      </div>
+
+      <!-- NOTICES -->
+      <div id="s-notices" class="screen">
+        <div class="fr rev d1">
+          <div class="fcp on rh" onclick="ftog(this)">All</div>
+          <div class="fcp rh" onclick="ftog(this)">📝 Exams</div>
+          <div class="fcp rh" onclick="ftog(this)">🎉 Events</div>
+          <div class="fcp rh" onclick="ftog(this)">🌿 Holidays</div>
+          <div class="fcp rh" onclick="ftog(this)">⚡ Urgent</div>
+        </div>
+        <div class="card rev d2">
+          <div class="noti rh" onclick="openM('mNotice')"><span class="tag tex">EXAM</span><div><div class="nott">MST-2 Schedule — May 5–9, 2025 📌</div><div class="notm">Admin · 2 hrs ago · Pinned</div></div></div>
+          <div class="noti rh" onclick="toast('🌿','Holiday: College closed April 20')"><span class="tag tho">HOLIDAY</span><div><div class="nott">College Closed — Baisakhi (April 20)</div><div class="notm">Admin · 5 hrs ago</div></div></div>
+          <div class="noti rh" onclick="toast('🎉','TechFest Registration is now open!')"><span class="tag tev">EVENT</span><div><div class="nott">TechFest Registration Open — April 28</div><div class="notm">Student Council · 1 day ago</div></div></div>
+          <div class="noti rh" onclick="toast('⚡','Exam form deadline: April 25!')"><span class="tag tur">URGENT</span><div><div class="nott">Exam Form Last Date — April 25</div><div class="notm">Exam Cell · 2 days ago</div></div></div>
+          <div class="noti rh" onclick="toast('🎭','Cultural Night — May 2, Main Auditorium')"><span class="tag tev">EVENT</span><div><div class="nott">Cultural Night — May 2, Main Auditorium</div><div class="notm">Cultural Committee · 3 days ago</div></div></div>
+        </div>
+      </div>
+
+      <!-- CAFETERIA -->
+      <div id="s-cafeteria" class="screen">
+        <div class="banner rev d1" style="margin-bottom:20px">
+          <div class="ban-ico">🍽️</div>
+          <div class="ban-t"><strong style="color:var(--grn)">Cafeteria Open · Closes 5 PM</strong><span>Today's special: Masala Dosa ₹30 — Limited!</span></div>
+        </div>
+        <div class="fr rev d2">
+          <div class="fcp on rh" onclick="ftog(this)">All Items</div>
+          <div class="fcp rh" onclick="ftog(this)">🥗 Snacks</div>
+          <div class="fcp rh" onclick="ftog(this)">🍛 Meals</div>
+          <div class="fcp rh" onclick="ftog(this)">☕ Drinks</div>
+          <div class="fcp rh" onclick="ftog(this)">⭐ Top Rated</div>
+        </div>
+        <div class="g3 rev d3">
+          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fffde7,#fff3e0)">🥪<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Veg Sandwich</div><div class="fp">₹25</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★★</span><span class="rc2"> 4.8 (42)</span></div></div></div>
+          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fce4ec,#fffde7)">🫓<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Bread Pakora</div><div class="fp">₹15</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.2 (28)</span></div></div></div>
+          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#e8f5e9,#fffde7)">🫙<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Masala Dosa</div><div class="fp">₹30</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★★</span><span class="rc2"> 4.9 (19)</span></div></div></div>
+          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fbe9e7,#fffde7)">☕<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Chai / Tea</div><div class="fp">₹10</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.5 (87)</span></div></div></div>
+          <div class="food rh" onclick="toast('😔','Dal Rice Thali is sold out today!')"><div class="ft" style="background:linear-gradient(135deg,#eceff1,#f5f5f5);opacity:.65">🍲<span class="fav avn">✕ Sold Out</span></div><div class="fb" style="opacity:.6"><div class="fn">Dal Rice Thali</div><div class="fp">₹50</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★</span><span class="rc2"> 3.6 (15)</span></div></div></div>
+          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#e3f2fd,#fffde7)">🧃<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Cold Drink</div><div class="fp">₹20</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.0 (31)</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div id="s-links" class="screen">
+        <p style="color:var(--mut);font-size:13px;margin-bottom:20px" class="rev d1">Tap any card to open the official portal.</p>
+        <div class="g4 rev d2">
+          <div class="lc rh" onclick="toast('📝','Opening Exam Form Portal...')"><div class="lico" style="background:rgba(192,57,43,.12)">📝</div><div class="ln">Exam Form</div><div class="lu">examcell.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('🏆','Opening Results Portal...')"><div class="lico" style="background:rgba(212,160,0,.15)">🏆</div><div class="ln">Results</div><div class="lu">results.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('💳','Opening Fee Payment...')"><div class="lico" style="background:rgba(45,122,58,.12)">💳</div><div class="ln">Fee Payment</div><div class="lu">fees.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('📚','Opening OPAC Library...')"><div class="lico" style="background:rgba(26,111,168,.12)">📚</div><div class="ln">OPAC Library</div><div class="lu">library.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('📅','Opening Timetable...')"><div class="lico" style="background:rgba(230,126,0,.12)">📅</div><div class="ln">Timetable</div><div class="lu">portal.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('🎓','Opening Scholarship Portal...')"><div class="lico" style="background:rgba(212,160,0,.15)">🎓</div><div class="ln">Scholarship</div><div class="lu">scholarship.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('📣','Opening Grievance Portal...')"><div class="lico" style="background:rgba(192,57,43,.12)">📣</div><div class="ln">Grievance</div><div class="lu">grievance.ikgptu.ac.in</div><div class="la">↗</div></div>
+          <div class="lc rh" onclick="toast('🌐','Opening PTU Official Site...')"><div class="lico" style="background:rgba(45,122,58,.12)">🌐</div><div class="ln">PTU Official</div><div class="lu">ikgptu.ac.in</div><div class="la">↗</div></div>
+        </div>
+      </div>
+
+      <!-- ANONASK -->
+      <div id="s-anon" class="screen">
+        <div class="fr2 mb22 rev d1" style="align-items:flex-start;gap:15px">
+          <div><div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:3px">👻 AnonAsk</div><div style="font-size:13px;color:var(--mut)">Ask anything. No name. No judgment.</div></div>
+          <button class="btn btp rh mla" onclick="openM('mAnon')">+ Ask Anonymously</button>
+        </div>
+        <div class="fr rev d2">
+          <div class="fcp on rh" onclick="ftog(this)">🔥 Trending</div>
+          <div class="fcp rh" onclick="ftog(this)">📚 Academic</div>
+          <div class="fcp rh" onclick="ftog(this)">🏕️ Campus Life</div>
+          <div class="fcp rh" onclick="ftog(this)">💬 Confessions</div>
+          <div class="fcp rh" onclick="ftog(this)">💡 Advice</div>
+        </div>
+        <div class="ac rh rev d3" onclick="openM('mAnon')">
+          <div class="ach"><div class="aav" style="background:rgba(212,160,0,.15)">🦉</div><div class="aun">SilentOwl_88</div><span class="tag tev" style="margin-left:7px;font-size:10px">Academic</span><div class="atm">34 min ago</div></div>
+          <div class="aq">Is Unit 7 (Fibre Optics) in MST-2 or only finals? Sir didn't clarify.</div>
+          <div class="tans"><div class="tal">✅ Top Answer · NightFox_321</div>Fibre Optics (Unit 6) is in MST-2. Nanomaterials (Unit 7) may also come. Check the notice board for syllabus.</div>
+          <div class="fr2"><div class="rb on rh">⬆️ 23</div><div class="rb rh">💬 8 answers</div><div class="rb rh">↗ Share</div></div>
+        </div>
+        <div class="ac rh rev d4" onclick="openM('mAnon')">
+          <div class="ach"><div class="aav" style="background:rgba(26,111,168,.12)">🌊</div><div class="aun">TidalWave_19</div><span class="tag tev" style="margin-left:7px;font-size:10px">Campus Life</span><div class="atm">2 hrs ago</div></div>
+          <div class="aq">Is the wifi in Block C actually good or is it just me getting 2 Mbps always? 😭</div>
+          <div class="fr2"><div class="rb rh">⬆️ 47</div><div class="rb rh">💬 12 answers</div><div class="rb rh">↗ Share</div></div>
+        </div>
+        <div class="ac rh rev d5" onclick="openM('mAnon')">
+          <div class="ach"><div class="aav" style="background:rgba(45,122,58,.12)">🌿</div><div class="aun">GhostLeaf_47</div><span class="tag tho" style="margin-left:7px;font-size:10px">Advice</span><div class="atm">5 hrs ago</div></div>
+          <div class="aq">How do you all manage studying with a bad roommate situation? Really affecting my focus.</div>
+          <div class="fr2"><div class="rb rh">⬆️ 31</div><div class="rb rh">💬 6 answers</div><div class="rb rh">↗ Share</div></div>
+        </div>
+      </div>
+
+      <!-- LOST & FOUND -->
+      <div id="s-lostfound" class="screen">
+        <div class="lft rev d1">
+          <div class="lftab on" id="ltab" onclick="lfSw('lost')">🔴 Lost Items (7)</div>
+          <div class="lftab" id="ftab" onclick="lfSw('found')">🟢 Found Items (3)</div>
+        </div>
+        <div class="fr2 mb22 rev d2">
+          <input class="inp" placeholder="Search by colour, type, location..." style="flex:1">
+          <button class="btn btp rh" onclick="openM('mLF')" style="flex-shrink:0">+ Report Item</button>
+        </div>
+        <div id="lostC">
+          <div class="lfi rh rev d3" onclick="openM('mChat')">
+            <div class="lfic">🎒</div>
+            <div style="flex:1">
+              <div class="fr2 mb6"><div class="lfn">Black Backpack</div><span class="tag tex mla" style="font-size:10px">Open</span></div>
+              <div class="lfd">Lost near library or Block B. Had my charger inside.</div>
+              <div class="lftr"><span class="lft2">Black</span><span class="lft2">Large</span><span class="lft2">Wildcraft</span><span class="lft2">Library area</span></div>
+              <div style="margin-top:9px;display:flex;gap:7px">
+                <button class="btn btg bts rh" onclick="event.stopPropagation();openM('mChat')">💬 Chat Finder</button>
+                <button class="btn btg bts rh" onclick="event.stopPropagation();toast('✅','Marked as found!')">✅ Mark Found</button>
+              </div>
+            </div>
+          </div>
+          <div class="lfi rh rev d4" onclick="openM('mChat')">
+            <div class="lfic">📱</div>
+            <div style="flex:1">
+              <div class="fr2 mb6"><div class="lfn">Blue Earphones</div><span class="tag tur mla" style="font-size:10px">Match Found!</span></div>
+              <div class="lfd">Boat earphones, lost in cafeteria during lunch.</div>
+              <div class="lftr"><span class="lft2">Blue/Black</span><span class="lft2">Wired</span><span class="lft2">Cafeteria</span></div>
+              <div style="margin-top:9px"><button class="btn btp bts rh" onclick="event.stopPropagation();openM('mChat')">💬 Chat Now</button></div>
+            </div>
+          </div>
+          <div class="lfi rh rev d5" onclick="openM('mChat')">
+            <div class="lfic">🪪</div>
+            <div style="flex:1">
+              <div class="fr2 mb6"><div class="lfn">College ID Card</div><span class="tag tex mla" style="font-size:10px">Open</span></div>
+              <div class="lfd">Dropped near Room 204, Block B corridor.</div>
+              <div class="lftr"><span class="lft2">ID Card</span><span class="lft2">Block B</span><span class="lft2">Room 204</span></div>
+            </div>
+          </div>
+        </div>
+        <div id="foundC" style="display:none">
+          <div class="lfi rh" onclick="openM('mChat')">
+            <div class="lfic">🔑</div>
+            <div style="flex:1">
+              <div class="fr2 mb6"><div class="lfn">Keys with Keychain</div><span class="tag tho mla" style="font-size:10px">Unclaimed</span></div>
+              <div class="lfd">Found near parking area. Has a Doraemon keychain.</div>
+              <div class="lftr"><span class="lft2">Keys</span><span class="lft2">Doraemon keychain</span><span class="lft2">Parking lot</span></div>
+              <div style="margin-top:9px"><button class="btn btp bts rh" onclick="event.stopPropagation();openM('mChat')">Claim This Item</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div id="s-attendance" class="screen">
+        <div class="g2 mb22 rev d1">
+          <div class="sc"><div class="si" style="background:rgba(45,122,58,.12)">📊</div><div class="sv">78%</div><div class="sl">Overall Attendance</div><div class="pb" style="margin-top:9px"><div class="pf" style="width:78%;background:var(--grn)"></div></div></div>
+          <div class="sc"><div class="si" style="background:rgba(230,126,0,.12)">⚠️</div><div class="sv" style="color:var(--acc2)">68%</div><div class="sl">Physics (Lowest)</div><div class="pb" style="margin-top:9px"><div class="pf" style="width:68%;background:var(--acc2)"></div></div></div>
+        </div>
+        <div class="card rev d2">
+          <div class="st mb16">Subject-wise Breakdown</div>
+          <div class="atr rh"><div class="ats">Engineering Physics</div><div class="atbw"><div class="pb"><div class="pf" style="width:68%;background:var(--acc2)"></div></div></div><div class="atpc" style="color:var(--acc2)">68%</div></div>
+          <div class="atr rh"><div class="ats">Mathematics II</div><div class="atbw"><div class="pb"><div class="pf" style="width:82%;background:var(--grn)"></div></div></div><div class="atpc" style="color:var(--grn)">82%</div></div>
+          <div class="atr rh"><div class="ats">Programming Fundamentals</div><div class="atbw"><div class="pb"><div class="pf" style="width:91%;background:var(--grn)"></div></div></div><div class="atpc" style="color:var(--grn)">91%</div></div>
+          <div class="atr rh"><div class="ats">Workshop Practice</div><div class="atbw"><div class="pb"><div class="pf" style="width:75%;background:var(--acc)"></div></div></div><div class="atpc" style="color:var(--acc)">75%</div></div>
+          <div class="atr rh"><div class="ats">Engineering Graphics</div><div class="atbw"><div class="pb"><div class="pf" style="width:55%;background:var(--red)"></div></div></div><div class="atpc" style="color:var(--red)">55%</div></div>
+        </div>
+      </div>
+
+      <!-- LIBRARY -->
+      <div id="s-library" class="screen">
+        <div class="sr rev d1" style="grid-template-columns:repeat(3,1fr)">
+          <div class="sc rh" onclick="toast('📖','2 books currently issued to you')"><div class="si" style="background:rgba(26,111,168,.12)">📖</div><div class="sv">2</div><div class="sl">Books Issued</div></div>
+          <div class="sc rh" onclick="toast('⏰','Return within 5 days!')"><div class="si" style="background:rgba(230,126,0,.12)">⏰</div><div class="sv" style="color:var(--acc2)">5</div><div class="sl">Days to Return</div></div>
+          <div class="sc rh" onclick="toast('✅','12 books issued all time')"><div class="si" style="background:rgba(45,122,58,.12)">✅</div><div class="sv">12</div><div class="sl">Total Issued</div></div>
+        </div>
+        <div class="st mb16 rev d2" style="margin-top:6px">📚 Your Issued Books</div>
+        <div class="card rev d3">
+          <div class="br rh" onclick="toast('📘','Book details: Engineering Physics — H.K. Malik')">
+            <div class="bico">📘</div><div><div class="bn">Engineering Physics — H.K. Malik</div><div class="bm">Issued: April 10 · Due: April 24</div></div>
+            <div class="dc dwn">5 days left</div>
+          </div>
+          <div class="br rh" onclick="toast('⚠️','Due today! Please return this book.')">
+            <div class="bico">📗</div><div><div class="bn">Higher Engineering Mathematics — B.S. Grewal</div><div class="bm">Issued: April 5 · Due: April 19</div></div>
+            <div class="dc dlate">⚠️ Due Today!</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mn" id="MN">
+  <div class="mnw">
+    <div class="mni on rh" onclick="mobGo(this,'home')"><span>🏠</span>Home</div>
+    <div class="mni rh" onclick="mobGo(this,'notices')"><span>📋</span>Notices</div>
+    <div class="mni rh" onclick="mobGo(this,'cafeteria')"><span>🍽️</span>Cafe</div>
+    <div class="mni rh" onclick="mobGo(this,'anon')"><span>👻</span>AnonAsk</div>
+    <div class="mni rh" onclick="mobGo(this,'links')"><span>🔗</span>Links</div>
+  </div>
+</div>
+
+<!-- FAB -->
+<div class="fab rh" id="FAB" onclick="openM('mAnon')">👻</div>
+
+<!-- MODALS -->
+<!-- Food -->
+<div class="mo" id="mFood"><div class="md"><div class="mdh"><div class="mdt">🥪 Veg Sandwich</div><div class="mdc rh" onclick="closeM('mFood')">✕</div></div><div class="fr2 mb16"><div style="font-size:50px;animation:floatY 2s ease-in-out infinite">🥪</div><div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--acc)">₹25</div><span class="tag tho">✓ Available</span></div></div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:9px">💬 Student Reviews</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:7px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦊 CosmicFox_204 · ★★★★★</div>Fresh, filling and worth it. The green chutney is 🔥</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:14px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦉 SilentOwl_88 · ★★★★</div>Good but sometimes the bread is a bit soggy.</div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:7px">Rate This Item</div><div id="starR" style="font-size:26px;letter-spacing:4px;cursor:pointer;color:var(--acc);transition:transform .2s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'" onclick="cycleStar()">★★★★☆</div><textarea class="inp" style="margin-top:11px" placeholder="Write a review..." rows="2"></textarea><button class="btn btp rh" style="width:100%;justify-content:center;margin-top:11px" onclick="toast('⭐','Review submitted! Thanks.');closeM('mFood')">Submit Review</button></div></div>
+
+<!-- AnonAsk -->
+<div class="mo" id="mAnon"><div class="md"><div class="mdh"><div class="mdt">👻 Ask Anonymously</div><div class="mdc rh" onclick="closeM('mAnon')">✕</div></div><div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;display:flex;gap:9px;margin-bottom:16px;font-size:13px;color:var(--txt2)"><span style="font-size:17px;flex-shrink:0">🔒</span><span>Your real name will <strong>never</strong> be shown. You appear as your alias.</span></div><div class="fg"><label class="fl">Category</label><select class="inp"><option>📚 Academic</option><option>🏕️ Campus Life</option><option>💬 Confession</option><option>💡 Advice</option><option>😤 Rant</option></select></div><div class="fg" style="margin-bottom:16px"><label class="fl">Your Question</label><textarea class="inp" rows="4" placeholder="What's on your mind? Ask anything..."></textarea></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="toast('👻','Posted anonymously!');closeM('mAnon')">Post Anonymously 👻</button></div></div>
+
+<!-- L&F -->
+<div class="mo" id="mLF"><div class="md"><div class="mdh"><div class="mdt">🔍 Report Item</div><div class="mdc rh" onclick="closeM('mLF')">✕</div></div><div class="lft" style="margin-bottom:16px"><div class="lftab on">🔴 I Lost Something</div><div class="lftab">🟢 I Found Something</div></div><div class="fg"><label class="fl">Item Name</label><input class="inp" placeholder="e.g. Black Backpack"></div><div class="fg"><label class="fl">Description</label><textarea class="inp" rows="2" placeholder="Describe the item..."></textarea></div><div class="fg"><label class="fl">Tags</label><input class="inp" placeholder="e.g. black, large, wildcraft"></div><div class="fg" style="margin-bottom:16px"><label class="fl">Location</label><input class="inp" placeholder="e.g. Library, Block B Corridor"></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="toast('📍','Item reported! Matching in progress...');closeM('mLF')">Post Item →</button></div></div>
+
+<!-- Chat -->
+<div class="mo" id="mChat"><div class="md"><div class="mdh"><div class="mdt">💬 Anonymous Chat</div><div class="mdc rh" onclick="closeM('mChat')">✕</div></div><div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:10px;padding:9px 13px;font-size:12px;color:var(--txt2);margin-bottom:14px">👻 Chatting anonymously. Identities revealed only after item is verified.</div><div style="max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;margin-bottom:13px;padding-right:3px"><div><div style="font-size:11px;color:var(--mut);margin-bottom:2px">NightFox_321 (Finder)</div><div style="background:var(--surf2);border:1.5px solid var(--bdr);border-radius:14px 14px 14px 4px;padding:9px 13px;font-size:13px;max-width:80%">Hi! I think I found your backpack. Is it large and black?</div></div><div style="align-self:flex-end"><div style="font-size:11px;color:var(--mut);text-align:right;margin-bottom:2px">You (CosmicFox_204)</div><div style="background:var(--acc);color:#000;border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:80%;font-weight:600">Yes! Does it have a red zipper inside?</div></div><div><div style="font-size:11px;color:var(--mut);margin-bottom:2px">NightFox_321 (Finder)</div><div style="background:var(--surf2);border:1.5px solid var(--bdr);border-radius:14px 14px 14px 4px;padding:9px 13px;font-size:13px;max-width:80%">Yes exactly! I'm near Block A right now.</div></div></div><div class="fr2"><input class="inp" placeholder="Type a message..." style="flex:1"><button class="btn btp rh" style="padding:10px 15px" onclick="toast('💬','Message sent!')">→</button></div></div></div>
+
+<!-- Notice -->
+<div class="mo" id="mNotice"><div class="md"><div class="mdh"><div class="mdt">📋 Notice Details</div><div class="mdc rh" onclick="closeM('mNotice')">✕</div></div><span class="tag tex" style="margin-bottom:13px;display:inline-block">EXAM</span><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:7px">MST-2 Schedule — May 5–9, 2025</div><div style="font-size:12px;color:var(--mut);margin-bottom:14px">Posted by Admin · 2 hours ago · 📌 Pinned</div><div style="font-size:14px;line-height:1.7;color:var(--txt2)">MST-2 examinations from <strong>May 5–9, 2025</strong>.<br><br>Engineering Physics: <strong>May 6, 10 AM–11 AM, Block B</strong><br>Mathematics II: <strong>May 7, 10 AM–11 AM, Block B</strong><br><br>Syllabus: Units 5–8. Carry your ID and admit card.</div><div class="dvd"></div><div class="fr2"><div class="rb on rh">👍 Useful (34)</div><div class="rb rh" onclick="toast('🔔','Reminder set for MST-2!')">🔔 Remind Me</div></div></div></div>
+
+<!-- Notifications -->
+<div class="mo" id="mNotif"><div class="md"><div class="mdh"><div class="mdt">🔔 Notifications</div><div class="mdc rh" onclick="closeM('mNotif')">✕</div></div><div style="display:flex;flex-direction:column;gap:2px"><div class="noti rh" onclick="closeM('mNotif');openM('mNotice')"><div style="font-size:21px">📢</div><div><div style="font-size:13px;font-weight:700">MST-2 Schedule Released</div><div class="tmut">2 hours ago</div></div><div style="width:8px;height:8px;background:var(--red);border-radius:50%;margin-left:auto;flex-shrink:0;animation:pulse 1.5s infinite"></div></div><div class="noti rh" onclick="closeM('mNotif');goTN('lostfound')"><div style="font-size:21px">🔍</div><div><div style="font-size:13px;font-weight:700">Possible match for your lost item!</div><div class="tmut">4 hours ago</div></div><div style="width:8px;height:8px;background:var(--red);border-radius:50%;margin-left:auto;flex-shrink:0;animation:pulse 1.5s infinite"></div></div><div class="noti rh" onclick="closeM('mNotif');goTN('anon')"><div style="font-size:21px">👻</div><div><div style="font-size:13px;font-weight:700">Someone answered your AnonAsk!</div><div class="tmut">Yesterday</div></div></div></div></div></div>
+
+<!-- Search -->
+<div class="mo" id="mSearch"><div class="md" style="width:500px"><div class="mdh"><div class="mdt">🔍 Search</div><div class="mdc rh" onclick="closeM('mSearch')">✕</div></div><input class="inp" placeholder="Search notices, food, lost items, people..." style="margin-bottom:14px" autofocus><div style="font-size:11px;font-weight:800;color:var(--mut);margin-bottom:9px;letter-spacing:1px">QUICK NAVIGATION</div><div style="display:flex;flex-wrap:wrap;gap:7px"><div class="fcp rh" onclick="closeM('mSearch');goTN('home')">🏠 Home</div><div class="fcp rh" onclick="closeM('mSearch');goTN('cafeteria')">🍽️ Cafeteria</div><div class="fcp rh" onclick="closeM('mSearch');goTN('anon')">👻 AnonAsk</div><div class="fcp rh" onclick="closeM('mSearch');goTN('lostfound')">🔍 Lost &amp; Found</div><div class="fcp rh" onclick="closeM('mSearch');goTN('notices')">📋 Notices</div><div class="fcp rh" onclick="closeM('mSearch');goTN('links')">🔗 Quick Links</div></div></div></div>
+
+<script>
+/* THEME */
+function toggleTheme(){
+  const h=document.documentElement, dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  ['aknob','lknob'].forEach(id=>{const k=document.getElementById(id);if(k)k.textContent=dark?'☀️':'🌙'});
+  toast(dark?'☀️':'🌙',dark?'Light Mode':'Dark Mode');
+}
+
+/* LOGIN */
+function doLogin(btn){
+  const roll=document.getElementById('rollI')?.value||'';
+  if(!roll){toast('❗','Enter your roll number first!');return}
+  btn.innerHTML='<div class="dl"><span></span><span></span><span></span></div>';
+  btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('mainApp').style.display='flex';
+    document.getElementById('FAB').style.display='flex';
+    setTimeout(()=>toast('🎓','Welcome, CosmicFox_204!'),300);
+    animateBars();
+  },1400);
+}
+
+/* NAVIGATION */
+const titles={home:'🏠 Home Feed',notices:'📋 Notice Board',cafeteria:'🍽️ Cafeteria',links:'🔗 Quick Links',anon:'👻 AnonAsk',lostfound:'🔍 Lost & Found',attendance:'✅ Attendance',library:'📚 Library'};
+function show(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById('s-'+name);
+  if(s)s.classList.add('active');
+  document.getElementById('PT').textContent=titles[name]||name;
+  if(name==='attendance')setTimeout(animateBars,100);
+}
+function goTo(el,name){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');show(name);
+}
+function goTN(name){
+  show(name);
+  document.querySelectorAll('.ni').forEach(n=>{n.classList.remove('active');if(n.textContent.trim().toLowerCase().includes(name.slice(0,4)))n.classList.add('active')});
+  document.querySelectorAll('.mni').forEach(m=>{m.classList.remove('on');if(m.textContent.toLowerCase().includes(name.slice(0,4)))m.classList.add('on')});
+}
+function mobGo(el,name){
+  document.querySelectorAll('.mni').forEach(m=>m.classList.remove('on'));
+  el.classList.add('on');show(name);
+}
+
+/* MODALS */
+function openM(id){const m=document.getElementById(id);if(m)m.classList.add('open')}
+function closeM(id){const m=document.getElementById(id);if(m)m.classList.remove('open')}
+document.addEventListener('click',e=>{if(e.target.classList.contains('mo'))e.target.classList.remove('open')});
+
+/* L&F TABS */
+function lfSw(t){
+  document.getElementById('ltab').classList.toggle('on',t==='lost');
+  document.getElementById('ftab').classList.toggle('on',t==='found');
+  document.getElementById('lostC').style.display=t==='lost'?'block':'none';
+  document.getElementById('foundC').style.display=t==='found'?'block':'none';
+}
+
+/* FILTER CHIPS */
+function ftog(el){el.classList.toggle('on')}
+
+/* REACT TOGGLE */
+function reactTog(el){
+  el.classList.toggle('on');
+  const sp=el.querySelector('span');
+  if(sp){const n=parseInt(sp.textContent);sp.textContent=el.classList.contains('on')?n+1:n-1}
+}
+
+/* BANNER */
+function rmBanner(){
+  const b=document.getElementById('HB');
+  if(b){b.style.transition='opacity .3s,transform .3s';b.style.opacity='0';b.style.transform='translateY(-10px)';setTimeout(()=>b.remove(),300)}
+}
+
+/* TOAST */
+function toast(icon,msg){
+  const s=document.getElementById('TS');
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<span style="font-size:17px">${icon}</span><span>${msg}</span>`;
+  s.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .3s,transform .3s';t.style.opacity='0';t.style.transform='translateX(20px)';setTimeout(()=>t.remove(),300)},2700);
+}
+
+/* RIPPLE */
+document.addEventListener('click',e=>{
+  const h=e.target.closest('.rh');
+  if(!h)return;
+  const r=document.createElement('div'),rect=h.getBoundingClientRect();
+  const sz=Math.max(rect.width,rect.height)*1.8;
+  r.className='rc';r.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px`;
+  h.appendChild(r);r.addEventListener('animationend',()=>r.remove());
+});
+
+/* STAR RATING */
+const stars=['★☆☆☆☆','★★☆☆☆','★★★☆☆','★★★★☆','★★★★★'];let si=3;
+function cycleStar(){si=(si+1)%5;const el=document.getElementById('starR');if(el){el.textContent=stars[si];el.style.transform='scale(1.25)';setTimeout(()=>el.style.transform='scale(1.05)',160)}}
+
+/* PROGRESS BARS ANIMATION */
+function animateBars(){
+  document.querySelectorAll('.pf').forEach(b=>{const w=b.style.width;b.style.width='0';requestAnimationFrame(()=>{setTimeout(()=>b.style.width=w,50)})});
+}
+window.addEventListener('load',()=>setTimeout(animateBars,400));
+</script>
+</body>
+</html>
