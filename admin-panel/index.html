@@ -784,7 +784,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
             </div>
           </div>
         </div>
-      </div>
+      <!-- ADMIN USERS -->
+      <div id="s-admin-users" class="screen">
         <div class="fr mb16">
           <div class="st">👥 User Management</div>
           <button class="btn btp rh" style="font-size:12px;padding:6px 12px" onclick="toast('🔧','Bulk operations coming soon!')">Bulk Edit</button>
@@ -826,37 +827,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
         </div>
       </div>
 
-      <!-- ADMIN MODERATION -->
-      <div id="s-admin-moderate" class="screen">
-        <div class="st mb16">⚖️ Moderation Center</div>
-        <div class="sr" style="grid-template-columns:1fr 1fr;gap:20px">
-          <div class="card">
-            <div class="fr mb16">
-              <div style="font-weight:700">Flagged AnonAsk Questions</div>
-              <div class="tag red">2 PENDING</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <div class="noti" style="background:var(--bg2);border-left:4px solid var(--red)">
-                <div style="font-size:13px;font-weight:700;margin-bottom:4px">"Is the exam date fixed?"</div>
-                <div style="font-size:11px;color:var(--mut)">Reported for: Spam · 2 hours ago</div>
-                <div class="fr" style="margin-top:10px">
-                  <button class="btn rh" style="font-size:11px;padding:5px 10px;background:var(--red);color:#fff">Delete</button>
-                  <button class="btn rh" style="font-size:11px;padding:5px 10px">Ignore</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="fr mb16">
-              <div style="font-weight:700">Lost & Found Reports</div>
-              <div class="tag blu">ACTIVE</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px" id="adminLfList">
-              <div class="noti" style="background:var(--bg2)">Loading reports...</div>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <!-- ADMIN SETTINGS -->
       <div id="s-admin-settings" class="screen">
@@ -870,9 +841,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
             </div>
           </div>
           <div class="fg">
+            <label class="fl">Home Feed Item Limit</label>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input class="inp" type="number" id="setHomeLimit" value="3" style="width:80px">
+              <span style="font-size:12px;color:var(--mut)">Number of recent items to show on Home Feed</span>
+              <button class="btn rh mla" style="padding:8px 15px" onclick="updateHomeLimit()">Update</button>
+            </div>
+          </div>
+          <div class="fg" style="margin-top:20px">
             <label class="fl">Announcement Alert</label>
-            <input class="inp" type="text" placeholder="Global banner message...">
-            <button class="btn btp rh" style="width:100%;margin-top:10px">Broadcast to All Users</button>
+            <input class="inp" type="text" placeholder="Global banner message..." id="setGlobalBanner">
+            <button class="btn btp rh" style="width:100%;margin-top:10px" onclick="toast('📣','Global broadcast active!')">Broadcast to All Users</button>
           </div>
           <hr style="margin:20px 0;border:none;border-top:1.5px solid var(--bdr)">
           <button class="btn rh" style="width:100%;color:var(--red);border-color:var(--red)" onclick="toast('⚠️','System reset locked.')">Factory Reset Database</button>
@@ -949,6 +928,7 @@ let currentUser = null;
 let currentRole = 'student';
 let editingFoodId = null;
 let editingNoticeId = null;
+let homeLimit = parseInt(localStorage.getItem('homeLimit')) || 3;
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
@@ -1242,14 +1222,15 @@ ftog = function(el) {
 function renderHomeCafe() {
   const c = document.getElementById('homeCafeCard');
   if(!c || !menuItems.length) return;
-  const item = menuItems[0];
-  c.innerHTML = `
-    <div class="fc rev d5 rh" onclick="goTN('cafeteria')">
+  const items = menuItems.slice(0, homeLimit);
+  
+  c.innerHTML = items.map((item, idx) => `
+    <div class="fc rev rh" style="margin-bottom:12px;animation-delay:${idx*0.1}s" onclick="goTN('cafeteria')">
       <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(212,160,0,.15)">🔥</div><div><div style="font-size:13px;font-weight:700">Cafeteria Trending</div><div class="tmut" style="margin-top:1px">${item.category}</div></div><span class="tag tev mla">Special</span></div>
       <div class="fcb"><div class="fct">${item.emoji} ${item.name} — ₹${item.price}</div><div class="fcs">Check out our latest and most popular campus meals!</div></div>
       <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('cafeteria')">🍽️ View Full Menu</div></div>
     </div>
-  `;
+  `).join('');
 }
 
 function renderMenu() {
@@ -1406,34 +1387,36 @@ function startNoticeListener() {
 function renderHomeNotice() {
   const c = document.getElementById('homeNoticeCard');
   if(!c || !noticeItems.length) return;
-  const n = noticeItems[0];
-  const time = n.createdAt ? new Date(n.createdAt.toDate()).toLocaleDateString() : 'Today';
+  const items = noticeItems.slice(0, homeLimit);
   
-  let tagCls = 'tev';
-  if(n.category==='Exam') tagCls='tex';
-  else if(n.category==='Holiday') tagCls='tho';
-  else if(n.category==='Urgent') tagCls='tur';
+  c.innerHTML = items.map((n, idx) => {
+    const time = n.createdAt ? new Date(n.createdAt.toDate()).toLocaleDateString() : 'Today';
+    let tagCls = 'tev';
+    if(n.category==='Exam') tagCls='tex';
+    else if(n.category==='Holiday') tagCls='tho';
+    else if(n.category==='Urgent') tagCls='tur';
 
-  c.innerHTML = `
-    <div class="fc rev d4 rh" onclick="openNoticeDetails('${n.id}')">
-      <div class="fch">
-        <div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div>
-        <div>
-          <div style="font-size:13px;font-weight:700">Official Notice</div>
-          <div class="tmut" style="margin-top:1px">${time} · by ${n.author || 'Admin'}</div>
+    return `
+      <div class="fc rev rh" style="margin-bottom:12px;animation-delay:${idx*0.1}s" onclick="openNoticeDetails('${n.id}')">
+        <div class="fch">
+          <div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Official Notice</div>
+            <div class="tmut" style="margin-top:1px">${time} · by ${n.author || 'Admin'}</div>
+          </div>
+          <span class="tag ${tagCls} mla">${n.category.toUpperCase()}</span>
         </div>
-        <span class="tag ${tagCls} mla">${n.category.toUpperCase()}</span>
+        <div class="fcb">
+          <div class="fct">${n.title}</div>
+          <div class="fcs">${n.content.length > 100 ? n.content.substring(0, 100) + '...' : n.content}</div>
+        </div>
+        <div class="fcf">
+          <div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>1</span></div>
+          <div class="rb rh" onclick="event.stopPropagation();toast('🔔','Reminder set!')">🔔 Remind Me</div>
+        </div>
       </div>
-      <div class="fcb">
-        <div class="fct">${n.title}</div>
-        <div class="fcs">${n.content.length > 100 ? n.content.substring(0, 100) + '...' : n.content}</div>
-      </div>
-      <div class="fcf">
-        <div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>1</span></div>
-        <div class="rb rh" onclick="event.stopPropagation();toast('🔔','Reminder set for this notice!')">🔔 Remind Me</div>
-      </div>
-    </div>
-  `;
+    `;
+  }).join('');
 }
 
 function renderNotices() {
@@ -1581,14 +1564,26 @@ function renderAnonAsk() {
 function renderHomeAnon() {
   const c = document.getElementById('homeAnonCard');
   if(!c || !anonItems.length) return;
-  const a = anonItems[0];
-  c.innerHTML = `
-    <div class="fc rev d6 rh" onclick="goTN('anon')">
+  const items = anonItems.slice(0, homeLimit);
+  
+  c.innerHTML = items.map((a, idx) => `
+    <div class="fc rev rh" style="margin-bottom:12px;animation-delay:${idx*0.1}s" onclick="goTN('anon')">
       <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:var(--tagbg)">👻</div><div><div style="font-size:13px;font-weight:700">AnonAsk — Latest</div><div class="tmut" style="margin-top:1px">${a.category}</div></div><span class="tag tev mla">Hot</span></div>
       <div class="fcb"><div class="fct">"${a.content.substring(0,80)}..."</div><div class="fcs">Community answering anonymously</div></div>
       <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('anon')">Answer anonymously →</div></div>
     </div>
-  `;
+  `).join('');
+}
+
+function updateHomeLimit() {
+  const val = parseInt(document.getElementById('setHomeLimit').value);
+  if(val < 1 || val > 10) { toast('❗','Limit must be 1-10'); return; }
+  homeLimit = val;
+  localStorage.setItem('homeLimit', val);
+  renderHomeNotice();
+  renderHomeCafe();
+  renderHomeAnon();
+  toast('⚙️','Home feed limit updated!');
 }
 
 async function submitAnonAsk() {
