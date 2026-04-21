@@ -39,13 +39,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 @keyframes bounceIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-@keyframes dotB{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
-@keyframes notifPop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
-@keyframes waveBar{0%,100%{height:5px}50%{height:18px}}
-@keyframes rippleA{to{transform:scale(4);opacity:0}}
-@keyframes glow{0%,100%{box-shadow:0 0 0 0 var(--aglow)}50%{box-shadow:0 0 0 10px transparent}}
-@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 
 .rev{opacity:0;animation:fadeUp .5s ease forwards}
@@ -74,7 +67,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .ni.active{background:var(--acc);color:#000;box-shadow:0 4px 16px var(--aglow)}
 .ni-ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
 .nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;animation:bounceIn .4s ease}
-.nbadge.y{background:var(--acc);color:#000}
 .sb-bot{margin-top:auto;padding:14px 11px;border-top:1.5px solid var(--bdr)}
 .upill{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;cursor:pointer;transition:background .2s,transform .2s}
 .upill:hover{background:var(--surf3);transform:scale(1.02)}
@@ -368,6 +360,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
       </div>
       <div class="fg"><label class="fl">College Roll Number</label><input class="inp" type="text" placeholder="e.g. 12301234" id="rollI"></div>
       <div class="fg" style="margin-bottom:20px"><label class="fl">Password</label><input class="inp" type="password" placeholder="Your college password" id="passI"></div>
+      <div id="loginError" style="color:var(--red);font-size:12px;margin-bottom:10px;text-align:center;display:none;font-weight:700"></div>
       <button class="btn btp rh" style="width:100%;justify-content:center;padding:12px" onclick="doLogin(this)" id="loginBtn">Sign In &nbsp;→</button>
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px">
         <span style="font-size:12px;color:var(--mut)">☀️</span>
@@ -410,12 +403,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
       <div class="ni rh" onclick="goTo(this,'attendance')"><span class="ni-ico">✅</span>Attendance</div>
       <div class="ni rh" onclick="goTo(this,'library')"><span class="ni-ico">📚</span>Library</div>
     </div>
+    <div class="ng" id="adminSidebar" style="margin-top:4px;display:none">
+      <div class="nl">Administrative</div>
+      <div class="ni rh" onclick="goTo(this,'admin')"><span class="ni-ico">🛡️</span>Admin Panel</div>
+    </div>
     <div class="sb-bot">
       <div class="upill rh" onclick="toast('⚙️','Profile settings coming soon!')">
-        <div class="uava">🦊</div>
-        <div><div style="font-size:13px;font-weight:700">CosmicFox_204</div><div style="font-size:11px;color:var(--mut)">Roll: 12301234 · CSE-A</div></div>
+        <div class="uava" id="uava">🦊</div>
+        <div><div style="font-size:13px;font-weight:700" id="uname">CosmicFox_204</div><div style="font-size:11px;color:var(--mut)"><span id="uroll">Roll: 12301234</span> · <span id="urole">Student</span></div></div>
         <div style="margin-left:auto;font-size:13px;color:var(--mut)">⚙️</div>
       </div>
+      <div class="ni rh" onclick="doLogout()" style="margin-top:6px;color:var(--red);font-size:13px;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:9px"><span>🚪</span>Logout</div>
     </div>
   </nav>
 
@@ -429,7 +427,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
         <div class="ibtn rh" onclick="goTN('lostfound')" title="Lost &amp; Found">🔍</div>
         <div class="ibtn rh" onclick="openM('mNotif')">🔔<div class="ndot"></div></div>
         <div class="ttog rh" onclick="toggleTheme()" title="Toggle theme"><div class="tknob" id="aknob">☀️</div></div>
-        <div class="uava rh" style="cursor:pointer;width:35px;height:35px;border-radius:10px" onclick="toast('🦊','That\'s you — CosmicFox_204!')">🦊</div>
+        <div class="uava rh" style="cursor:pointer;width:35px;height:35px;border-radius:10px" onclick="toast('🦊','That\'s you!')" id="tbava">🦊</div>
       </div>
     </header>
 
@@ -492,12 +490,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           <div class="fcp rh" onclick="ftog(this)">🌿 Holidays</div>
           <div class="fcp rh" onclick="ftog(this)">⚡ Urgent</div>
         </div>
-        <div class="card rev d2">
-          <div class="noti rh" onclick="openM('mNotice')"><span class="tag tex">EXAM</span><div><div class="nott">MST-2 Schedule — May 5–9, 2025 📌</div><div class="notm">Admin · 2 hrs ago · Pinned</div></div></div>
-          <div class="noti rh" onclick="toast('🌿','Holiday: College closed April 20')"><span class="tag tho">HOLIDAY</span><div><div class="nott">College Closed — Baisakhi (April 20)</div><div class="notm">Admin · 5 hrs ago</div></div></div>
-          <div class="noti rh" onclick="toast('🎉','TechFest Registration is now open!')"><span class="tag tev">EVENT</span><div><div class="nott">TechFest Registration Open — April 28</div><div class="notm">Student Council · 1 day ago</div></div></div>
-          <div class="noti rh" onclick="toast('⚡','Exam form deadline: April 25!')"><span class="tag tur">URGENT</span><div><div class="nott">Exam Form Last Date — April 25</div><div class="notm">Exam Cell · 2 days ago</div></div></div>
-          <div class="noti rh" onclick="toast('🎭','Cultural Night — May 2, Main Auditorium')"><span class="tag tev">EVENT</span><div><div class="nott">Cultural Night — May 2, Main Auditorium</div><div class="notm">Cultural Committee · 3 days ago</div></div></div>
+        <div class="card rev d2" id="noticesList">
+          <div style="text-align:center;padding:30px;color:var(--mut);">No notices found.</div>
         </div>
       </div>
 
@@ -514,14 +508,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           <div class="fcp rh" onclick="ftog(this)">☕ Drinks</div>
           <div class="fcp rh" onclick="ftog(this)">⭐ Top Rated</div>
         </div>
-        <div class="g3 rev d3">
-          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fffde7,#fff3e0)">🥪<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Veg Sandwich</div><div class="fp">₹25</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★★</span><span class="rc2"> 4.8 (42)</span></div></div></div>
-          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fce4ec,#fffde7)">🫓<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Bread Pakora</div><div class="fp">₹15</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.2 (28)</span></div></div></div>
-          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#e8f5e9,#fffde7)">🫙<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Masala Dosa</div><div class="fp">₹30</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★★</span><span class="rc2"> 4.9 (19)</span></div></div></div>
-          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#fbe9e7,#fffde7)">☕<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Chai / Tea</div><div class="fp">₹10</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.5 (87)</span></div></div></div>
-          <div class="food rh" onclick="toast('😔','Dal Rice Thali is sold out today!')"><div class="ft" style="background:linear-gradient(135deg,#eceff1,#f5f5f5);opacity:.65">🍲<span class="fav avn">✕ Sold Out</span></div><div class="fb" style="opacity:.6"><div class="fn">Dal Rice Thali</div><div class="fp">₹50</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★</span><span class="rc2"> 3.6 (15)</span></div></div></div>
-          <div class="food rh" onclick="openM('mFood')"><div class="ft" style="background:linear-gradient(135deg,#e3f2fd,#fffde7)">🧃<span class="fav avy">✓ Available</span></div><div class="fb"><div class="fn">Cold Drink</div><div class="fp">₹20</div><div class="fr2" style="margin-top:5px"><span class="stars">★★★★</span><span class="rc2"> 4.0 (31)</span></div></div></div>
-        </div>
+        <div class="g3 rev d3" id="cafeteriaGrid"></div>
+        <div id="cafeteriaEmpty" style="display:none;text-align:center;padding:40px;color:var(--mut);">No items found in this category.</div>
       </div>
 
       <!-- QUICK LINKS -->
@@ -552,22 +540,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           <div class="fcp rh" onclick="ftog(this)">💬 Confessions</div>
           <div class="fcp rh" onclick="ftog(this)">💡 Advice</div>
         </div>
-        <div class="ac rh rev d3" onclick="openM('mAnon')">
-          <div class="ach"><div class="aav" style="background:rgba(212,160,0,.15)">🦉</div><div class="aun">SilentOwl_88</div><span class="tag tev" style="margin-left:7px;font-size:10px">Academic</span><div class="atm">34 min ago</div></div>
-          <div class="aq">Is Unit 7 (Fibre Optics) in MST-2 or only finals? Sir didn't clarify.</div>
-          <div class="tans"><div class="tal">✅ Top Answer · NightFox_321</div>Fibre Optics (Unit 6) is in MST-2. Nanomaterials (Unit 7) may also come. Check the notice board for syllabus.</div>
-          <div class="fr2"><div class="rb on rh">⬆️ 23</div><div class="rb rh">💬 8 answers</div><div class="rb rh">↗ Share</div></div>
-        </div>
-        <div class="ac rh rev d4" onclick="openM('mAnon')">
-          <div class="ach"><div class="aav" style="background:rgba(26,111,168,.12)">🌊</div><div class="aun">TidalWave_19</div><span class="tag tev" style="margin-left:7px;font-size:10px">Campus Life</span><div class="atm">2 hrs ago</div></div>
-          <div class="aq">Is the wifi in Block C actually good or is it just me getting 2 Mbps always? 😭</div>
-          <div class="fr2"><div class="rb rh">⬆️ 47</div><div class="rb rh">💬 12 answers</div><div class="rb rh">↗ Share</div></div>
-        </div>
-        <div class="ac rh rev d5" onclick="openM('mAnon')">
-          <div class="ach"><div class="aav" style="background:rgba(45,122,58,.12)">🌿</div><div class="aun">GhostLeaf_47</div><span class="tag tho" style="margin-left:7px;font-size:10px">Advice</span><div class="atm">5 hrs ago</div></div>
-          <div class="aq">How do you all manage studying with a bad roommate situation? Really affecting my focus.</div>
-          <div class="fr2"><div class="rb rh">⬆️ 31</div><div class="rb rh">💬 6 answers</div><div class="rb rh">↗ Share</div></div>
-        </div>
+        <div id="anonList"></div>
       </div>
 
       <!-- LOST & FOUND -->
@@ -580,48 +553,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           <input class="inp" placeholder="Search by colour, type, location..." style="flex:1">
           <button class="btn btp rh" onclick="openM('mLF')" style="flex-shrink:0">+ Report Item</button>
         </div>
-        <div id="lostC">
-          <div class="lfi rh rev d3" onclick="openM('mChat')">
-            <div class="lfic">🎒</div>
-            <div style="flex:1">
-              <div class="fr2 mb6"><div class="lfn">Black Backpack</div><span class="tag tex mla" style="font-size:10px">Open</span></div>
-              <div class="lfd">Lost near library or Block B. Had my charger inside.</div>
-              <div class="lftr"><span class="lft2">Black</span><span class="lft2">Large</span><span class="lft2">Wildcraft</span><span class="lft2">Library area</span></div>
-              <div style="margin-top:9px;display:flex;gap:7px">
-                <button class="btn btg bts rh" onclick="event.stopPropagation();openM('mChat')">💬 Chat Finder</button>
-                <button class="btn btg bts rh" onclick="event.stopPropagation();toast('✅','Marked as found!')">✅ Mark Found</button>
-              </div>
-            </div>
-          </div>
-          <div class="lfi rh rev d4" onclick="openM('mChat')">
-            <div class="lfic">📱</div>
-            <div style="flex:1">
-              <div class="fr2 mb6"><div class="lfn">Blue Earphones</div><span class="tag tur mla" style="font-size:10px">Match Found!</span></div>
-              <div class="lfd">Boat earphones, lost in cafeteria during lunch.</div>
-              <div class="lftr"><span class="lft2">Blue/Black</span><span class="lft2">Wired</span><span class="lft2">Cafeteria</span></div>
-              <div style="margin-top:9px"><button class="btn btp bts rh" onclick="event.stopPropagation();openM('mChat')">💬 Chat Now</button></div>
-            </div>
-          </div>
-          <div class="lfi rh rev d5" onclick="openM('mChat')">
-            <div class="lfic">🪪</div>
-            <div style="flex:1">
-              <div class="fr2 mb6"><div class="lfn">College ID Card</div><span class="tag tex mla" style="font-size:10px">Open</span></div>
-              <div class="lfd">Dropped near Room 204, Block B corridor.</div>
-              <div class="lftr"><span class="lft2">ID Card</span><span class="lft2">Block B</span><span class="lft2">Room 204</span></div>
-            </div>
-          </div>
-        </div>
-        <div id="foundC" style="display:none">
-          <div class="lfi rh" onclick="openM('mChat')">
-            <div class="lfic">🔑</div>
-            <div style="flex:1">
-              <div class="fr2 mb6"><div class="lfn">Keys with Keychain</div><span class="tag tho mla" style="font-size:10px">Unclaimed</span></div>
-              <div class="lfd">Found near parking area. Has a Doraemon keychain.</div>
-              <div class="lftr"><span class="lft2">Keys</span><span class="lft2">Doraemon keychain</span><span class="lft2">Parking lot</span></div>
-              <div style="margin-top:9px"><button class="btn btp bts rh" onclick="event.stopPropagation();openM('mChat')">Claim This Item</button></div>
-            </div>
-          </div>
-        </div>
+        <div id="lostList"></div>
+        <div id="foundList" style="display:none"></div>
       </div>
 
       <!-- ATTENDANCE -->
@@ -660,6 +593,47 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
         </div>
       </div>
 
+      <!-- ADMIN PANEL -->
+      <div id="s-admin" class="screen">
+        <div class="fr" style="margin-bottom:20px">
+          <div class="st">🛡️ Admin Control Center</div>
+          <div class="tag tur">SYSTEM ACTIVE</div>
+        </div>
+        
+        <div class="sr rev d1" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+          <div class="sc rh"><div class="si" style="background:var(--acc3)">👥</div><div class="sv" id="statUsers">...</div><div class="sl">Total Users</div></div>
+          <div class="sc rh"><div class="si" style="background:var(--acc2)">📋</div><div class="sv" id="statNotices">...</div><div class="sl">Total Notices</div></div>
+          <div class="sc rh"><div class="si" style="background:var(--acc)">🍽️</div><div class="sv" id="statMenu">...</div><div class="sl">Menu Items</div></div>
+          <div class="sc rh"><div class="si" style="background:var(--red)">🔍</div><div class="sv" id="statLost">...</div><div class="sl">Lost Reports</div></div>
+        </div>
+
+        <div class="sr rev d2" style="grid-template-columns:1.5fr 1fr;gap:20px">
+          <div class="card">
+            <div class="fr mb16" style="padding:0 4px">
+              <div style="font-weight:700">👤 User Management</div>
+              <button class="btn btp rh" style="font-size:12px;padding:6px 12px" onclick="toast('🔧','Role management coming soon!')">+ Change Role</button>
+            </div>
+            <div id="adminUserList" style="display:flex;flex-direction:column;gap:10px">
+              <div class="noti" style="background:var(--bg2)">
+                <div style="font-weight:700;font-size:13px">Loading user database...</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="fr mb16" style="padding:0 4px">
+              <div style="font-weight:700">🕒 System Logs</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;font-family:monospace;font-size:11px;color:var(--mut)">
+              <div style="padding:8px;border-left:2px solid var(--acc)">[SUCCESS] Firestore connected successfully</div>
+              <div style="padding:8px;border-left:2px solid var(--acc)">[AUTH] Admin session started for Sahil</div>
+              <div style="padding:8px;border-left:2px solid var(--acc)">[DB] Realtime listeners established</div>
+              <div id="sysLog" style="padding:8px;border-left:2px solid var(--mut)">[READY] Waiting for commands...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -680,19 +654,37 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 
 <!-- MODALS -->
 <!-- Food -->
-<div class="mo" id="mFood"><div class="md"><div class="mdh"><div class="mdt">🥪 Veg Sandwich</div><div class="mdc rh" onclick="closeM('mFood')">✕</div></div><div class="fr2 mb16"><div style="font-size:50px;animation:floatY 2s ease-in-out infinite">🥪</div><div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--acc)">₹25</div><span class="tag tho">✓ Available</span></div></div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:9px">💬 Student Reviews</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:7px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦊 CosmicFox_204 · ★★★★★</div>Fresh, filling and worth it. The green chutney is 🔥</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:14px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦉 SilentOwl_88 · ★★★★</div>Good but sometimes the bread is a bit soggy.</div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:7px">Rate This Item</div><div id="starR" style="font-size:26px;letter-spacing:4px;cursor:pointer;color:var(--acc);transition:transform .2s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'" onclick="cycleStar()">★★★★☆</div><textarea class="inp" style="margin-top:11px" placeholder="Write a review..." rows="2"></textarea><button class="btn btp rh" style="width:100%;justify-content:center;margin-top:11px" onclick="toast('⭐','Review submitted! Thanks.');closeM('mFood')">Submit Review</button></div></div>
+<div class="mo" id="mFood"><div class="md"><div class="mdh"><div class="mdt" id="vFoodName">🥪 Veg Sandwich</div><div class="mdc rh" onclick="closeM('mFood')">✕</div></div><div class="fr2 mb16"><div style="font-size:50px;animation:floatY 2s ease-in-out infinite" id="vFoodIco">🥪</div><div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--acc)" id="vFoodPrice">₹25</div><span class="tag tho" id="vFoodStatus">✓ Available</span></div></div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:9px">💬 Student Reviews</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:7px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦊 CosmicFox_204 · ★★★★★</div>Fresh, filling and worth it. The green chutney is 🔥</div><div style="background:var(--surf2);border-radius:11px;padding:11px;margin-bottom:14px;font-size:13px"><div style="font-size:11px;color:var(--acc);font-weight:800;margin-bottom:3px">🦉 SilentOwl_88 · ★★★★</div>Good but sometimes the bread is a bit soggy.</div><div class="dvd"></div><div style="font-size:13px;font-weight:700;margin-bottom:7px">Rate This Item</div><div id="starR" style="font-size:26px;letter-spacing:4px;cursor:pointer;color:var(--acc);transition:transform .2s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'" onclick="cycleStar()">★★★★☆</div><textarea class="inp" style="margin-top:11px" placeholder="Write a review..." rows="2"></textarea><button class="btn btp rh" style="width:100%;justify-content:center;margin-top:11px" onclick="toast('⭐','Review submitted! Thanks.');closeM('mFood')">Submit Review</button></div></div>
+
+<!-- Add/Edit Food Admin -->
+<div class="mo" id="mAddFood"><div class="md"><div class="mdh"><div class="mdt">➕ Add Food Item</div><div class="mdc rh" onclick="closeM('mAddFood')">✕</div></div>
+<div class="fg"><label class="fl">Item Name</label><input class="inp" id="fName" placeholder="e.g. Masala Dosa"></div>
+<div class="fg"><label class="fl">Emoji</label><input class="inp" id="fEmoji" placeholder="e.g. 🫙"></div>
+<div class="fg"><label class="fl">Price (₹)</label><input class="inp" id="fPrice" type="number" placeholder="e.g. 30"></div>
+<div class="fg"><label class="fl">Category</label><select class="inp" id="fCat"><option value="snack">🥗 Snack</option><option value="lunch">🍛 Meal</option><option value="drinks">☕ Drink</option></select></div>
+<div class="fg" style="margin-bottom:16px"><label class="fl">Availability</label><select class="inp" id="fAvail"><option value="true">✓ Available</option><option value="false">✕ Sold Out</option></select></div>
+<button class="btn btp rh" style="width:100%;justify-content:center" onclick="submitFoodItem()">Save Item →</button>
+</div></div>
 
 <!-- AnonAsk -->
-<div class="mo" id="mAnon"><div class="md"><div class="mdh"><div class="mdt">👻 Ask Anonymously</div><div class="mdc rh" onclick="closeM('mAnon')">✕</div></div><div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;display:flex;gap:9px;margin-bottom:16px;font-size:13px;color:var(--txt2)"><span style="font-size:17px;flex-shrink:0">🔒</span><span>Your real name will <strong>never</strong> be shown. You appear as your alias.</span></div><div class="fg"><label class="fl">Category</label><select class="inp"><option>📚 Academic</option><option>🏕️ Campus Life</option><option>💬 Confession</option><option>💡 Advice</option><option>😤 Rant</option></select></div><div class="fg" style="margin-bottom:16px"><label class="fl">Your Question</label><textarea class="inp" rows="4" placeholder="What's on your mind? Ask anything..."></textarea></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="toast('👻','Posted anonymously!');closeM('mAnon')">Post Anonymously 👻</button></div></div>
+<div class="mo" id="mAnon"><div class="md"><div class="mdh"><div class="mdt">👻 Ask Anonymously</div><div class="mdc rh" onclick="closeM('mAnon')">✕</div></div><div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;display:flex;gap:9px;margin-bottom:16px;font-size:13px;color:var(--txt2)"><span style="font-size:17px;flex-shrink:0">🔒</span><span>Your real name will <strong>never</strong> be shown. You appear as your alias.</span></div><div class="fg"><label class="fl">Category</label><select class="inp" id="aCat"><option value="Academic">📚 Academic</option><option value="Campus Life">🏕️ Campus Life</option><option value="Confession">💬 Confession</option><option value="Advice">💡 Advice</option><option value="Rant">😤 Rant</option></select></div><div class="fg" style="margin-bottom:16px"><label class="fl">Your Question</label><textarea class="inp" id="aContent" rows="4" placeholder="What's on your mind? Ask anything..."></textarea></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="submitAnonAsk()">Post Anonymously 👻</button></div></div>
 
 <!-- L&F -->
-<div class="mo" id="mLF"><div class="md"><div class="mdh"><div class="mdt">🔍 Report Item</div><div class="mdc rh" onclick="closeM('mLF')">✕</div></div><div class="lft" style="margin-bottom:16px"><div class="lftab on">🔴 I Lost Something</div><div class="lftab">🟢 I Found Something</div></div><div class="fg"><label class="fl">Item Name</label><input class="inp" placeholder="e.g. Black Backpack"></div><div class="fg"><label class="fl">Description</label><textarea class="inp" rows="2" placeholder="Describe the item..."></textarea></div><div class="fg"><label class="fl">Tags</label><input class="inp" placeholder="e.g. black, large, wildcraft"></div><div class="fg" style="margin-bottom:16px"><label class="fl">Location</label><input class="inp" placeholder="e.g. Library, Block B Corridor"></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="toast('📍','Item reported! Matching in progress...');closeM('mLF')">Post Item →</button></div></div>
+<div class="mo" id="mLF"><div class="md"><div class="mdh"><div class="mdt">🔍 Report Item</div><div class="mdc rh" onclick="closeM('mLF')">✕</div></div><div class="lft" style="margin-bottom:16px"><div class="lftab on" id="lfTypeLost" onclick="setLfType('lost')">🔴 I Lost Something</div><div class="lftab" id="lfTypeFound" onclick="setLfType('found')">🟢 I Found Something</div></div><input type="hidden" id="lfType" value="lost"><div class="fg"><label class="fl">Item Name</label><input class="inp" id="lfName" placeholder="e.g. Black Backpack"></div><div class="fg"><label class="fl">Description</label><textarea class="inp" id="lfDesc" rows="2" placeholder="Describe the item..."></textarea></div><div class="fg"><label class="fl">Tags</label><input class="inp" id="lfTags" placeholder="e.g. black, large, wildcraft"></div><div class="fg" style="margin-bottom:16px"><label class="fl">Location</label><input class="inp" id="lfLoc" placeholder="e.g. Library, Block B Corridor"></div><button class="btn btp rh" style="width:100%;justify-content:center" onclick="submitLostFound()">Post Item →</button></div></div>
 
 <!-- Chat -->
 <div class="mo" id="mChat"><div class="md"><div class="mdh"><div class="mdt">💬 Anonymous Chat</div><div class="mdc rh" onclick="closeM('mChat')">✕</div></div><div style="background:var(--tagbg);border:1.5px solid var(--bdr2);border-radius:10px;padding:9px 13px;font-size:12px;color:var(--txt2);margin-bottom:14px">👻 Chatting anonymously. Identities revealed only after item is verified.</div><div style="max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;margin-bottom:13px;padding-right:3px"><div><div style="font-size:11px;color:var(--mut);margin-bottom:2px">NightFox_321 (Finder)</div><div style="background:var(--surf2);border:1.5px solid var(--bdr);border-radius:14px 14px 14px 4px;padding:9px 13px;font-size:13px;max-width:80%">Hi! I think I found your backpack. Is it large and black?</div></div><div style="align-self:flex-end"><div style="font-size:11px;color:var(--mut);text-align:right;margin-bottom:2px">You (CosmicFox_204)</div><div style="background:var(--acc);color:#000;border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:80%;font-weight:600">Yes! Does it have a red zipper inside?</div></div><div><div style="font-size:11px;color:var(--mut);margin-bottom:2px">NightFox_321 (Finder)</div><div style="background:var(--surf2);border:1.5px solid var(--bdr);border-radius:14px 14px 14px 4px;padding:9px 13px;font-size:13px;max-width:80%">Yes exactly! I'm near Block A right now.</div></div></div><div class="fr2"><input class="inp" placeholder="Type a message..." style="flex:1"><button class="btn btp rh" style="padding:10px 15px" onclick="toast('💬','Message sent!')">→</button></div></div></div>
 
-<!-- Notice -->
-<div class="mo" id="mNotice"><div class="md"><div class="mdh"><div class="mdt">📋 Notice Details</div><div class="mdc rh" onclick="closeM('mNotice')">✕</div></div><span class="tag tex" style="margin-bottom:13px;display:inline-block">EXAM</span><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:7px">MST-2 Schedule — May 5–9, 2025</div><div style="font-size:12px;color:var(--mut);margin-bottom:14px">Posted by Admin · 2 hours ago · 📌 Pinned</div><div style="font-size:14px;line-height:1.7;color:var(--txt2)">MST-2 examinations from <strong>May 5–9, 2025</strong>.<br><br>Engineering Physics: <strong>May 6, 10 AM–11 AM, Block B</strong><br>Mathematics II: <strong>May 7, 10 AM–11 AM, Block B</strong><br><br>Syllabus: Units 5–8. Carry your ID and admit card.</div><div class="dvd"></div><div class="fr2"><div class="rb on rh">👍 Useful (34)</div><div class="rb rh" onclick="toast('🔔','Reminder set for MST-2!')">🔔 Remind Me</div></div></div></div>
+<!-- Notice View -->
+<div class="mo" id="mNotice"><div class="md"><div class="mdh"><div class="mdt">📋 Notice Details</div><div class="mdc rh" onclick="closeM('mNotice')">✕</div></div><span class="tag tex" id="vnTag" style="margin-bottom:13px;display:inline-block">EXAM</span><div id="vnTitle" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:7px">MST-2 Schedule</div><div id="vnMeta" style="font-size:12px;color:var(--mut);margin-bottom:14px">Posted by Admin</div><div id="vnContent" style="font-size:14px;line-height:1.7;color:var(--txt2)"></div><div class="dvd"></div><div class="fr2"><div class="rb on rh">👍 Useful (0)</div><div class="rb rh" onclick="toast('🔔','Reminder set!')">🔔 Remind Me</div></div></div></div>
+
+<!-- Add Notice Admin -->
+<div class="mo" id="mAddNotice"><div class="md"><div class="mdh"><div class="mdt">➕ Post Notice</div><div class="mdc rh" onclick="closeM('mAddNotice')">✕</div></div>
+<div class="fg"><label class="fl">Notice Title</label><input class="inp" id="nTitle" placeholder="e.g. Exam Schedule Released"></div>
+<div class="fg"><label class="fl">Category</label><select class="inp" id="nCat"><option value="Exam">📝 Exam</option><option value="Event">🎉 Event</option><option value="Holiday">🌿 Holiday</option><option value="Urgent">⚡ Urgent</option><option value="General">📰 General</option></select></div>
+<div class="fg"><label class="fl">Content</label><textarea class="inp" id="nContent" rows="4" placeholder="Write notice details here..."></textarea></div>
+<button class="btn btp rh" style="width:100%;justify-content:center" onclick="submitNotice()">Post Notice 📢</button>
+</div></div>
 
 <!-- Notifications -->
 <div class="mo" id="mNotif"><div class="md"><div class="mdh"><div class="mdt">🔔 Notifications</div><div class="mdc rh" onclick="closeM('mNotif')">✕</div></div><div style="display:flex;flex-direction:column;gap:2px"><div class="noti rh" onclick="closeM('mNotif');openM('mNotice')"><div style="font-size:21px">📢</div><div><div style="font-size:13px;font-weight:700">MST-2 Schedule Released</div><div class="tmut">2 hours ago</div></div><div style="width:8px;height:8px;background:var(--red);border-radius:50%;margin-left:auto;flex-shrink:0;animation:pulse 1.5s infinite"></div></div><div class="noti rh" onclick="closeM('mNotif');goTN('lostfound')"><div style="font-size:21px">🔍</div><div><div style="font-size:13px;font-weight:700">Possible match for your lost item!</div><div class="tmut">4 hours ago</div></div><div style="width:8px;height:8px;background:var(--red);border-radius:50%;margin-left:auto;flex-shrink:0;animation:pulse 1.5s infinite"></div></div><div class="noti rh" onclick="closeM('mNotif');goTN('anon')"><div style="font-size:21px">👻</div><div><div style="font-size:13px;font-weight:700">Someone answered your AnonAsk!</div><div class="tmut">Yesterday</div></div></div></div></div></div>
@@ -700,7 +692,54 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 <!-- Search -->
 <div class="mo" id="mSearch"><div class="md" style="width:500px"><div class="mdh"><div class="mdt">🔍 Search</div><div class="mdc rh" onclick="closeM('mSearch')">✕</div></div><input class="inp" placeholder="Search notices, food, lost items, people..." style="margin-bottom:14px" autofocus><div style="font-size:11px;font-weight:800;color:var(--mut);margin-bottom:9px;letter-spacing:1px">QUICK NAVIGATION</div><div style="display:flex;flex-wrap:wrap;gap:7px"><div class="fcp rh" onclick="closeM('mSearch');goTN('home')">🏠 Home</div><div class="fcp rh" onclick="closeM('mSearch');goTN('cafeteria')">🍽️ Cafeteria</div><div class="fcp rh" onclick="closeM('mSearch');goTN('anon')">👻 AnonAsk</div><div class="fcp rh" onclick="closeM('mSearch');goTN('lostfound')">🔍 Lost &amp; Found</div><div class="fcp rh" onclick="closeM('mSearch');goTN('notices')">📋 Notices</div><div class="fcp rh" onclick="closeM('mSearch');goTN('links')">🔗 Quick Links</div></div></div></div>
 
+<!-- FIREBASE SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="firebase-config.js"></script>
+
 <script>
+/* GLOBALS & AUTH STATE */
+let currentUser = null;
+let currentRole = 'student';
+
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    console.log("Logged in UID:", user.uid);
+    try {
+      const snap = await db.collection('user').doc(user.uid).get();
+      console.log("User doc exists:", snap.exists);
+      if (snap.exists) {
+        console.log("User doc data:", snap.data());
+        currentRole = snap.data().role || 'student';
+      } else {
+        console.log("No document found in 'user' collection for UID:", user.uid);
+        currentRole = 'student';
+      }
+    } catch(e) { 
+      console.error("Firestore fetch error:", e);
+      currentRole = 'student'; 
+    }
+    showApp();
+  } else {
+    currentUser = null;
+    currentRole = 'student';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('FAB').style.display = 'none';
+    // Clear fields to avoid interference from old sessions or autofill
+    const r = document.getElementById('rollI');
+    const p = document.getElementById('passI');
+    if(r) r.value = '';
+    if(p) p.value = '';
+  }
+});
+
+function rollToEmail(roll) {
+  return roll.replace(/\s+/g,'').toLowerCase() + '@campus.local';
+}
+
 /* THEME */
 function toggleTheme(){
   const h=document.documentElement, dark=h.getAttribute('data-theme')==='dark';
@@ -710,22 +749,92 @@ function toggleTheme(){
 }
 
 /* LOGIN */
-function doLogin(btn){
+async function doLogin(btn){
   const roll=document.getElementById('rollI')?.value||'';
-  if(!roll){toast('❗','Enter your roll number first!');return}
+  const pass=document.getElementById('passI')?.value||'';
+  const err=document.getElementById('loginError');
+  err.style.display='none';
+  
+  if(!roll || !pass){
+    err.textContent = 'Enter your roll number and password!';
+    err.style.display = 'block';
+    return;
+  }
+  
+  const email = roll.includes('@') ? roll : rollToEmail(roll);
+  
   btn.innerHTML='<div class="dl"><span></span><span></span><span></span></div>';
   btn.disabled=true;
-  setTimeout(()=>{
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('mainApp').style.display='flex';
-    document.getElementById('FAB').style.display='flex';
-    setTimeout(()=>toast('🎓','Welcome, CosmicFox_204!'),300);
-    animateBars();
-  },1400);
+  
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    err.textContent = e.message || 'Login failed.';
+    err.style.display = 'block';
+    btn.innerHTML = 'Sign In &nbsp;→';
+    btn.disabled = false;
+  }
+}
+
+function showApp() {
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('mainApp').style.display='flex';
+  document.getElementById('FAB').style.display='flex';
+  
+  // Update UI with user info
+  const name = currentUser.email.split('@')[0].toUpperCase();
+  document.getElementById('uname').textContent = name;
+  document.getElementById('uroll').textContent = 'Roll: ' + name;
+  document.getElementById('urole').textContent = currentRole === 'student' ? 'Student' : 'Admin (' + currentRole + ')';
+  
+  const av = name.slice(0,2);
+  document.getElementById('uava').textContent = av;
+  document.getElementById('tbava').textContent = av;
+  
+  applyRoleVisibility();
+  toast('🎓','Welcome, ' + name + '!');
+  animateBars();
+}
+
+function applyRoleVisibility() {
+  const isSuper = currentRole === 'super_admin';
+  const isCaf   = currentRole === 'cafeteria_admin' || isSuper;
+  
+  // Cafeteria Add Button
+  if (isCaf && !document.getElementById('adminCafBtn')) {
+    const cafHeader = document.querySelector('#s-cafeteria .fr');
+    if (cafHeader) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btp rh mla';
+      btn.id = 'adminCafBtn';
+      btn.innerHTML = '+ Add Item';
+      btn.onclick = () => openM('mAddFood');
+      cafHeader.appendChild(btn);
+    }
+  }
+
+  // Notice Add Button
+  if (isSuper && !document.getElementById('adminNotBtn')) {
+    const notHeader = document.querySelector('#s-notices .fr');
+    if (notHeader) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btp rh mla';
+      btn.id = 'adminNotBtn';
+      btn.innerHTML = '+ Post Notice';
+      btn.onclick = () => openM('mAddNotice');
+      notHeader.appendChild(btn);
+    }
+  }
+
+  // Admin Sidebar Section
+  if (isSuper) {
+    document.getElementById('adminSidebar').style.display = 'block';
+    startAdminListeners();
+  }
 }
 
 /* NAVIGATION */
-const titles={home:'🏠 Home Feed',notices:'📋 Notice Board',cafeteria:'🍽️ Cafeteria',links:'🔗 Quick Links',anon:'👻 AnonAsk',lostfound:'🔍 Lost & Found',attendance:'✅ Attendance',library:'📚 Library'};
+const titles={home:'🏠 Home Feed',notices:'📋 Notice Board',cafeteria:'🍽️ Cafeteria',links:'🔗 Quick Links',anon:'👻 AnonAsk',lostfound:'🔍 Lost & Found',attendance:'✅ Attendance',library:'📚 Library',admin:'🛡️ Admin Control Center'};
 function show(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const s=document.getElementById('s-'+name);
@@ -751,6 +860,21 @@ function mobGo(el,name){
 function openM(id){const m=document.getElementById(id);if(m)m.classList.add('open')}
 function closeM(id){const m=document.getElementById(id);if(m)m.classList.remove('open')}
 document.addEventListener('click',e=>{if(e.target.classList.contains('mo'))e.target.classList.remove('open')});
+
+/* LOGOUT */
+function doLogout(){
+  auth.signOut().then(()=>{
+    currentUser=null; currentRole=null;
+    if(menuUnsub) menuUnsub();
+    if(noticeUnsub) noticeUnsub();
+    document.getElementById('mainApp').style.display='none';
+    document.getElementById('FAB').style.display='none';
+    document.getElementById('loginPage').style.display='flex';
+    document.getElementById('rollI').value='';
+    document.getElementById('passI').value='';
+    toast('👋','Logged out successfully!');
+  });
+}
 
 /* L&F TABS */
 function lfSw(t){
@@ -799,11 +923,377 @@ document.addEventListener('click',e=>{
 const stars=['★☆☆☆☆','★★☆☆☆','★★★☆☆','★★★★☆','★★★★★'];let si=3;
 function cycleStar(){si=(si+1)%5;const el=document.getElementById('starR');if(el){el.textContent=stars[si];el.style.transform='scale(1.25)';setTimeout(()=>el.style.transform='scale(1.05)',160)}}
 
+/* CAFETERIA LOGIC */
+let cafFilter = 'all';
+let menuItems = [];
+let menuUnsub = null;
+
+function startCafeteriaListener() {
+  if (menuUnsub) menuUnsub();
+  menuUnsub = db.collection('cafeteria_menu')
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => {
+      menuItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderMenu();
+    }, e => {
+      console.error(e);
+      toast('❗','Failed to load cafeteria items');
+    });
+}
+
+function setCafFilter(val, el) {
+  cafFilter = val;
+  document.querySelectorAll('#s-cafeteria .fcp').forEach(t => t.classList.remove('on'));
+  if (el) el.classList.add('on');
+  renderMenu();
+}
+
+// Override original ftog to hook into cafFilter
+const originalFtog = ftog;
+ftog = function(el) {
+  originalFtog(el);
+  const text = el.textContent.trim();
+  if(text.includes('All')) setCafFilter('all', el);
+  else if(text.includes('Snacks')) setCafFilter('snack', el);
+  else if(text.includes('Meals')) setCafFilter('lunch', el);
+  else if(text.includes('Drinks')) setCafFilter('drinks', el);
+}
+
+function renderMenu() {
+  const grid = document.getElementById('cafeteriaGrid');
+  const empty = document.getElementById('cafeteriaEmpty');
+  
+  const list = cafFilter === 'all' ? menuItems : menuItems.filter(i => i.category === cafFilter);
+  
+  if (list.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  const isCaf = currentRole === 'cafeteria_admin' || currentRole === 'super_admin';
+  
+  grid.innerHTML = list.map(item => {
+    const isAvail = item.available !== false;
+    const adminControls = isCaf ? `<div style="position:absolute;top:8px;left:8px;z-index:10;display:flex;gap:4px">
+      <div class="rb rh" style="padding:4px;font-size:11px" onclick="event.stopPropagation();deleteFoodItem('${item.id}')">🗑️</div>
+    </div>` : '';
+    
+    return `
+      <div class="food rh" style="position:relative" onclick="openFoodDetails('${item.id}')">
+        ${adminControls}
+        <div class="ft" style="background:linear-gradient(135deg,#fffde7,#fff3e0); ${!isAvail ? 'opacity:0.65;' : ''}">
+          ${item.emoji || '🍽️'}
+          ${isAvail ? '<span class="fav avy">✓ Available</span>' : '<span class="fav avn">✕ Sold Out</span>'}
+        </div>
+        <div class="fb" style="${!isAvail ? 'opacity:0.6;' : ''}">
+          <div class="fn">${item.name}</div>
+          <div class="fp">₹${item.price}</div>
+          <div class="fr2" style="margin-top:5px">
+            <span class="stars">★★★★☆</span>
+            <span class="rc2"> 4.5 (12)</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function submitFoodItem() {
+  const name = document.getElementById('fName').value.trim();
+  const price = document.getElementById('fPrice').value;
+  const cat = document.getElementById('fCat').value;
+  const avail = document.getElementById('fAvail').value === 'true';
+  const emoji = document.getElementById('fEmoji').value || '🍽️';
+  
+  if (!name || !price) { toast('❗', 'Name and Price required!'); return; }
+  
+  try {
+    await db.collection('cafeteria_menu').add({
+      name, price: Number(price), category: cat,
+      available: avail, emoji, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('✅', 'Food item added successfully!');
+    closeM('mAddFood');
+    document.getElementById('fName').value = '';
+    document.getElementById('fPrice').value = '';
+  } catch(e) {
+    toast('❗', 'Failed to add item');
+  }
+}
+
+async function deleteFoodItem(id) {
+  if(confirm("Are you sure you want to delete this item?")) {
+    await db.collection('cafeteria_menu').doc(id).delete();
+    toast('🗑️', 'Item deleted');
+  }
+}
+
+function openFoodDetails(id) {
+  const item = menuItems.find(i => i.id === id);
+  if(!item) return;
+  document.getElementById('vFoodName').textContent = item.emoji + ' ' + item.name;
+  document.getElementById('vFoodIco').textContent = item.emoji;
+  document.getElementById('vFoodPrice').textContent = '₹' + item.price;
+  
+  const st = document.getElementById('vFoodStatus');
+  if (item.available !== false) {
+    st.className = 'tag tho'; st.textContent = '✓ Available';
+  } else {
+    st.className = 'tag tex'; st.textContent = '✕ Sold Out';
+  }
+  openM('mFood');
+}
+
 /* PROGRESS BARS ANIMATION */
 function animateBars(){
   document.querySelectorAll('.pf').forEach(b=>{const w=b.style.width;b.style.width='0';requestAnimationFrame(()=>{setTimeout(()=>b.style.width=w,50)})});
 }
 window.addEventListener('load',()=>setTimeout(animateBars,400));
+
+/* NOTICES LOGIC */
+let noticeItems = [];
+let noticeUnsub = null;
+
+function startNoticeListener() {
+  if (noticeUnsub) noticeUnsub();
+  noticeUnsub = db.collection('notices')
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => {
+      noticeItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderNotices();
+    }, e => console.error(e));
+}
+
+function renderNotices() {
+  const list = document.getElementById('noticesList');
+  if (noticeItems.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mut);">No notices found.</div>';
+    return;
+  }
+  
+  const isSuper = currentRole === 'super_admin';
+  
+  list.innerHTML = noticeItems.map(item => {
+    const time = item.createdAt ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Just now';
+    let tagCls = 'tev';
+    if(item.category==='Exam') tagCls='tex';
+    else if(item.category==='Holiday') tagCls='tho';
+    else if(item.category==='Urgent') tagCls='tur';
+    
+    const delBtn = isSuper ? `<div style="margin-left:auto" class="rb rh" onclick="event.stopPropagation();deleteNotice('${item.id}')">🗑️ Delete</div>` : '';
+    
+    return `
+      <div class="noti rh" onclick="openNoticeDetails('${item.id}')">
+        <span class="tag ${tagCls}" style="width:70px;justify-content:center">${item.category.toUpperCase()}</span>
+        <div style="flex:1">
+          <div class="nott">${item.title}</div>
+          <div class="notm">${item.author || 'Admin'} · ${time}</div>
+        </div>
+        ${delBtn}
+      </div>
+    `;
+  }).join('');
+}
+
+async function submitNotice() {
+  const title = document.getElementById('nTitle').value.trim();
+  const cat = document.getElementById('nCat').value;
+  const content = document.getElementById('nContent').value.trim();
+  if(!title || !content) { toast('❗','Title and content required!'); return; }
+  
+  try {
+    await db.collection('notices').add({
+      title, category: cat, content,
+      author: currentUser.email.split('@')[0].toUpperCase(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('✅','Notice posted!');
+    closeM('mAddNotice');
+    document.getElementById('nTitle').value = '';
+    document.getElementById('nContent').value = '';
+  } catch(e) { toast('❗','Failed to post notice'); }
+}
+
+async function deleteNotice(id) {
+  if(confirm('Delete this notice?')) {
+    await db.collection('notices').doc(id).delete();
+    toast('🗑️','Notice deleted');
+  }
+}
+
+function openNoticeDetails(id) {
+  const item = noticeItems.find(n => n.id === id);
+  if(!item) return;
+  
+  document.getElementById('vnTitle').textContent = item.title;
+  document.getElementById('vnContent').innerHTML = item.content.replace(/\n/g, '<br>');
+  const time = item.createdAt ? new Date(item.createdAt.toDate()).toLocaleString() : 'Just now';
+  document.getElementById('vnMeta').textContent = `Posted by ${item.author || 'Admin'} · ${time}`;
+  
+  const tg = document.getElementById('vnTag');
+  tg.textContent = item.category.toUpperCase();
+  let tagCls = 'tev';
+  if(item.category==='Exam') tagCls='tex';
+  else if(item.category==='Holiday') tagCls='tho';
+  else if(item.category==='Urgent') tagCls='tur';
+  tg.className = 'tag ' + tagCls;
+  
+  openM('mNotice');
+}
+
+/* ANONASK & LOST FOUND LOGIC */
+let anonItems = [];
+let lfItems = [];
+
+function startMiscListeners() {
+  db.collection('anon_ask').orderBy('createdAt','desc').onSnapshot(snap => {
+    anonItems = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderAnonAsk();
+  });
+  db.collection('lost_found').orderBy('createdAt','desc').onSnapshot(snap => {
+    lfItems = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderLostFound();
+  });
+}
+
+function renderAnonAsk() {
+  const c = document.getElementById('anonList');
+  if(anonItems.length===0){ c.innerHTML='<div style="text-align:center;padding:30px;color:var(--mut);">No questions yet.</div>'; return; }
+  
+  c.innerHTML = anonItems.map(item => {
+    const time = item.createdAt ? new Date(item.createdAt.toDate()).toLocaleTimeString() : 'Just now';
+    return `
+      <div class="ac rh rev d3" onclick="openM('mAnon')">
+        <div class="ach"><div class="aav" style="background:var(--acc);color:#000">${item.avatar||'👻'}</div><div class="aun">${item.alias}</div><span class="tag tev" style="margin-left:7px;font-size:10px">${item.category}</span><div class="atm">${time}</div></div>
+        <div class="aq">${item.content}</div>
+        <div class="fr2"><div class="rb rh">⬆️ ${item.upvotes||0}</div><div class="rb rh">💬 Answer</div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function submitAnonAsk() {
+  const content = document.getElementById('aContent').value.trim();
+  const cat = document.getElementById('aCat').value;
+  if(!content) return toast('❗','Question is empty!');
+  
+  const avatars = ['👻','🦊','🦉','🌊','🌿','🦊','🐼','🤖'];
+  const aliases = ['Ghost','Fox','Owl','Wave','Leaf','Ninja','Panda','Bot'];
+  const alias = aliases[Math.floor(Math.random()*aliases.length)] + '_' + Math.floor(Math.random()*100);
+  
+  await db.collection('anon_ask').add({
+    content, category: cat, alias, avatar: avatars[Math.floor(Math.random()*avatars.length)],
+    upvotes: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  toast('👻','Posted anonymously!');
+  closeM('mAnon');
+  document.getElementById('aContent').value='';
+}
+
+function setLfType(t) {
+  document.getElementById('lfTypeLost').className = t==='lost'?'lftab on':'lftab';
+  document.getElementById('lfTypeFound').className = t==='found'?'lftab on':'lftab';
+  document.getElementById('lfType').value = t;
+}
+
+function renderLostFound() {
+  const lostC = document.getElementById('lostList');
+  const foundC = document.getElementById('foundList');
+  
+  const lost = lfItems.filter(i => i.type === 'lost');
+  const found = lfItems.filter(i => i.type === 'found');
+  
+  const renderItem = (item) => {
+    const tags = (item.tags||'').split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span class="lft2">${t}</span>`).join('');
+    const btnText = item.type === 'lost' ? '💬 Chat Finder' : 'Claim This Item';
+    return `
+      <div class="lfi rh" onclick="openM('mChat')">
+        <div class="lfic">${item.type==='lost'?'🎒':'🔑'}</div>
+        <div style="flex:1">
+          <div class="fr2 mb6"><div class="lfn">${item.name}</div><span class="tag ${item.type==='lost'?'tex':'tho'} mla" style="font-size:10px">${item.type==='lost'?'Open':'Unclaimed'}</span></div>
+          <div class="lfd">${item.desc}</div>
+          <div class="lftr">${tags} <span class="lft2">${item.location}</span></div>
+          <div style="margin-top:9px"><button class="btn btp bts rh" onclick="event.stopPropagation();openM('mChat')">${btnText}</button></div>
+        </div>
+      </div>
+    `;
+  };
+  
+  lostC.innerHTML = lost.length ? lost.map(renderItem).join('') : '<div style="text-align:center;padding:30px;color:var(--mut);">No lost items reported.</div>';
+  foundC.innerHTML = found.length ? found.map(renderItem).join('') : '<div style="text-align:center;padding:30px;color:var(--mut);">No found items reported.</div>';
+  
+  // Also fix lfSw behavior to use the new IDs
+  lfSw = function(t) {
+    document.getElementById('ltab').classList.toggle('on',t==='lost');
+    document.getElementById('ftab').classList.toggle('on',t==='found');
+    document.getElementById('lostList').style.display = t==='lost'?'block':'none';
+    document.getElementById('foundList').style.display = t==='found'?'block':'none';
+  }
+}
+
+async function submitLostFound() {
+  const type = document.getElementById('lfType').value;
+  const name = document.getElementById('lfName').value.trim();
+  const desc = document.getElementById('lfDesc').value.trim();
+  const tags = document.getElementById('lfTags').value.trim();
+  const loc = document.getElementById('lfLoc').value.trim();
+  
+  if(!name || !desc) return toast('❗','Name and description required!');
+  
+  await db.collection('lost_found').add({
+    type, name, desc, tags, location: loc,
+    reporter: currentUser.email,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  toast('📍','Item reported successfully!');
+  closeM('mLF');
+  document.getElementById('lfName').value='';
+  document.getElementById('lfDesc').value='';
+  document.getElementById('lfTags').value='';
+  document.getElementById('lfLoc').value='';
+}
+
+/* ADMIN LISTENERS */
+let adminUnsubs = [];
+function startAdminListeners() {
+  // Clear previous
+  adminUnsubs.forEach(u => u());
+  adminUnsubs = [];
+
+  // Stats
+  adminUnsubs.push(db.collection('user').onSnapshot(s => {
+    document.getElementById('statUsers').textContent = s.size;
+    renderAdminUserList(s.docs);
+  }));
+  adminUnsubs.push(db.collection('notices').onSnapshot(s => document.getElementById('statNotices').textContent = s.size));
+  adminUnsubs.push(db.collection('cafeteria_menu').onSnapshot(s => document.getElementById('statMenu').textContent = s.size));
+  adminUnsubs.push(db.collection('lost_found').onSnapshot(s => document.getElementById('statLost').textContent = s.size));
+}
+
+function renderAdminUserList(docs) {
+  const c = document.getElementById('adminUserList');
+  c.innerHTML = docs.map(d => {
+    const u = d.data();
+    return `
+      <div class="noti rh" style="background:var(--bg2);padding:12px">
+        <div style="font-weight:700">${u.name || 'Anonymous'}</div>
+        <div class="tmut" style="font-size:11px">Roll: ${u.rollNo || 'N/A'} · Role: ${u.role || 'student'}</div>
+        <div style="margin-left:auto"><button class="btn rh" style="font-size:10px;padding:4px 8px" onclick="toast('⚙️','Managing ${u.rollNo}...')">Edit</button></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Start listening after auth loads and role is applied
+const oldShowApp2 = showApp;
+showApp = function() {
+  oldShowApp2();
+  startMiscListeners();
+}
 </script>
 </body>
 </html>
