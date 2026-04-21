@@ -405,7 +405,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
     </div>
     <div class="ng" id="adminSidebar" style="margin-top:4px;display:none">
       <div class="nl">Administrative</div>
-      <div class="ni rh" onclick="goTo(this,'admin')"><span class="ni-ico">🛡️</span>Admin Panel</div>
+      <div class="ni rh" onclick="goTo(this,'admin')"><span class="ni-ico">🛡️</span>Dashboard</div>
+      <div class="ni rh" onclick="goTo(this,'admin-users')"><span class="ni-ico">👥</span>Users & Roles</div>
+      <div class="ni rh" onclick="goTo(this,'admin-notices')"><span class="ni-ico">📋</span>Notice Board</div>
+      <div class="ni rh" onclick="goTo(this,'admin-push')"><span class="ni-ico">🔔</span>Push Notifs</div>
+      <div class="ni rh" onclick="goTo(this,'admin-cafeteria')"><span class="ni-ico">🍽️</span>Cafeteria Menu</div>
+      <div class="ni rh" onclick="goTo(this,'admin-chat')"><span class="ni-ico">💬</span>Chat Control</div>
+      <div class="ni rh" onclick="goTo(this,'admin-moderate')"><span class="ni-ico">⚖️</span>Moderation</div>
+      <div class="ni rh" onclick="goTo(this,'admin-analytics')"><span class="ni-ico">📊</span>Analytics</div>
+      <div class="ni rh" onclick="goTo(this,'admin-history')"><span class="ni-ico">📜</span>System Logs</div>
+      <div class="ni rh" onclick="goTo(this,'admin-settings')"><span class="ni-ico">⚙️</span>Settings</div>
     </div>
     <div class="sb-bot">
       <div class="upill rh" onclick="toast('⚙️','Profile settings coming soon!')">
@@ -444,17 +453,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
         <div class="sr rev d2">
           <div class="sc rh" onclick="goTN('notices')">
             <div class="si" style="background:rgba(212,160,0,.15)">📋</div>
-            <div class="sv">5</div><div class="sl">Active Notices</div>
+            <div class="sv" id="homeStatNotices">...</div><div class="sl">Active Notices</div>
             <span class="sbg" style="background:rgba(45,122,58,.15);color:var(--grn)">+2 new</span>
           </div>
           <div class="sc rh" onclick="goTN('cafeteria')">
             <div class="si" style="background:rgba(230,126,0,.15)">🍽️</div>
-            <div class="sv">12</div><div class="sl">Menu Items</div>
+            <div class="sv" id="homeStatMenu">...</div><div class="sl">Menu Items</div>
             <span class="sbg" style="background:rgba(45,122,58,.15);color:var(--grn)">Open</span>
           </div>
           <div class="sc rh" onclick="goTN('lostfound')">
             <div class="si" style="background:rgba(192,57,43,.12)">🔍</div>
-            <div class="sv">7</div><div class="sl">Lost Items</div>
+            <div class="sv" id="homeStatLost">...</div><div class="sl">Lost Items</div>
             <span class="sbg" style="background:rgba(192,57,43,.12);color:var(--red)">2 open</span>
           </div>
           <div class="sc rh" onclick="goTN('attendance')">
@@ -464,20 +473,26 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           </div>
         </div>
         <div class="sh rev d3"><div class="st">📰 Campus Feed</div><div class="sa rh" onclick="goTN('notices')">See all →</div></div>
-        <div class="fc rev d4 rh" onclick="openM('mNotice')">
-          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div><div><div style="font-size:13px;font-weight:700">Official Notice</div><div class="tmut" style="margin-top:1px">2 hours ago</div></div><span class="tag tex mla">EXAM</span></div>
-          <div class="fcb"><div class="fct">MST-2 Schedule Released — May 5–9</div><div class="fcs">Engineering Physics MST-2 on May 6, 10 AM–11 AM, Block B. Units 5–8.</div></div>
-          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>34</span></div><div class="rb rh" onclick="event.stopPropagation();toast('❓','Marked as confusing')">❓ Confusing <span>4</span></div></div>
+        <div id="homeNoticeCard">
+          <div class="fc rev d4 rh" onclick="openM('mNotice')">
+            <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div><div><div style="font-size:13px;font-weight:700">Official Notice</div><div class="tmut" style="margin-top:1px">2 hours ago</div></div><span class="tag tex mla">EXAM</span></div>
+            <div class="fcb"><div class="fct">MST-2 Schedule Released — May 5–9</div><div class="fcs">Engineering Physics MST-2 on May 6, 10 AM–11 AM, Block B. Units 5–8.</div></div>
+            <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>34</span></div><div class="rb rh" onclick="event.stopPropagation();toast('❓','Marked as confusing')">❓ Confusing <span>4</span></div></div>
+          </div>
         </div>
-        <div class="fc rev d5 rh" onclick="goTN('cafeteria')">
-          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(212,160,0,.15)">🔥</div><div><div style="font-size:13px;font-weight:700">Cafeteria Trending</div><div class="tmut" style="margin-top:1px">Today's top rated</div></div><span class="tag tev mla">★ 4.8</span></div>
-          <div class="fcb"><div class="fct">🥪 Veg Sandwich — ₹25</div><div class="fcs">"Fresh and filling — the best thing here." — CosmicFox_204</div></div>
-          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('cafeteria')">🍽️ View Full Menu</div></div>
+        <div id="homeCafeCard">
+          <div class="fc rev d5 rh" onclick="goTN('cafeteria')">
+            <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(212,160,0,.15)">🔥</div><div><div style="font-size:13px;font-weight:700">Cafeteria Trending</div><div class="tmut" style="margin-top:1px">Today's top pick</div></div><span class="tag tev mla">Special</span></div>
+            <div class="fcb"><div class="fct">Loading trending item...</div><div class="fcs">Check out the latest additions to the menu!</div></div>
+            <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('cafeteria')">🍽️ View Full Menu</div></div>
+          </div>
         </div>
-        <div class="fc rev d6 rh" onclick="goTN('anon')">
-          <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:var(--tagbg)">👻</div><div><div style="font-size:13px;font-weight:700">AnonAsk — Trending</div><div class="tmut" style="margin-top:1px">30 min ago · 8 answers</div></div><span class="tag tev mla">Academic</span></div>
-          <div class="fcb"><div class="fct">"Is Unit 7 (Fibre Optics) in MST-2 or only finals?"</div><div class="fcs">23 upvotes · Community answering anonymously</div></div>
-          <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('anon')">Answer anonymously →</div></div>
+        <div id="homeAnonCard">
+          <div class="fc rev d6 rh" onclick="goTN('anon')">
+            <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:var(--tagbg)">👻</div><div><div style="font-size:13px;font-weight:700">AnonAsk — Trending</div><div class="tmut" style="margin-top:1px">Recent</div></div><span class="tag tev mla">Community</span></div>
+            <div class="fcb"><div class="fct">Loading trending questions...</div><div class="fcs">Join the anonymous campus conversation!</div></div>
+            <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('anon')">Answer anonymously →</div></div>
+          </div>
         </div>
       </div>
 
@@ -593,10 +608,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
         </div>
       </div>
 
-      <!-- ADMIN PANEL -->
+      <!-- ADMIN DASHBOARD (Overview) -->
       <div id="s-admin" class="screen">
         <div class="fr" style="margin-bottom:20px">
-          <div class="st">🛡️ Admin Control Center</div>
+          <div class="st">🛡️ Admin Command Center</div>
           <div class="tag tur">SYSTEM ACTIVE</div>
         </div>
         
@@ -607,30 +622,260 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
           <div class="sc rh"><div class="si" style="background:var(--red)">🔍</div><div class="sv" id="statLost">...</div><div class="sl">Lost Reports</div></div>
         </div>
 
-        <div class="sr rev d2" style="grid-template-columns:1.5fr 1fr;gap:20px">
+        <div class="card">
+          <div class="fr mb16" style="padding:0 4px">
+            <div style="font-weight:700">🕒 System Activity Logs</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;font-family:monospace;font-size:11px;color:var(--mut)">
+            <div style="padding:8px;border-left:2px solid var(--acc)">[SUCCESS] Firestore connected successfully</div>
+            <div style="padding:8px;border-left:2px solid var(--acc)">[AUTH] Admin session active: Sahil</div>
+            <div style="padding:8px;border-left:2px solid var(--acc)">[DB] Realtime listeners established</div>
+            <div id="sysLog" style="padding:8px;border-left:2px solid var(--mut)">[READY] System monitoring active...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN NOTICES -->
+      <div id="s-admin-notices" class="screen">
+        <div class="fr mb16">
+          <div class="st">📋 Notice Board Management</div>
+          <button class="btn btp rh" onclick="openM('mNotice')">+ Create New Notice</button>
+        </div>
+        <div class="card">
+          <div class="fr mb16" style="padding:0 4px"><div style="font-weight:700">Active Notices</div><span class="tag tur">LIVE</span></div>
+          <div id="adminNoticeList" style="display:flex;flex-direction:column;gap:12px">
+            <div class="noti" style="background:var(--bg2)">Loading notices...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN PUSH NOTIFS -->
+      <div id="s-admin-push" class="screen">
+        <div class="st mb16">🔔 Push Notification System</div>
+        <div class="sr" style="grid-template-columns:1.5fr 1fr;gap:20px">
           <div class="card">
-            <div class="fr mb16" style="padding:0 4px">
-              <div style="font-weight:700">👤 User Management</div>
-              <button class="btn btp rh" style="font-size:12px;padding:6px 12px" onclick="toast('🔧','Role management coming soon!')">+ Change Role</button>
+            <div style="font-weight:700;margin-bottom:15px">Create Broadcast</div>
+            <div class="fg"><label class="fl">Title</label><input class="inp" type="text" placeholder="Urgent Announcement..." id="pushTitle"></div>
+            <div class="fg"><label class="fl">Message Content</label><textarea class="inp" style="height:80px;resize:none" placeholder="Enter notification details..." id="pushMsg"></textarea></div>
+            <div class="fr mb16" style="gap:15px">
+              <div style="flex:1"><label class="fl">Category</label><select class="inp"><option>Notice</option><option>Urgent</option><option>Event</option><option>Holiday</option></select></div>
+              <div style="flex:1"><label class="fl">Target Audience</label><select class="inp" id="pushTarget"><option value="all">All Students</option><option value="batch">Specific Batch</option><option value="dept">Specific Dept</option></select></div>
             </div>
-            <div id="adminUserList" style="display:flex;flex-direction:column;gap:10px">
-              <div class="noti" style="background:var(--bg2)">
-                <div style="font-weight:700;font-size:13px">Loading user database...</div>
+            <button class="btn btp rh" style="width:100%;padding:12px" onclick="toast('🚀','Broadcasting push notification...')">Send Immediate Notification</button>
+          </div>
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Delivery Analytics</div>
+            <div style="display:flex;flex-direction:column;gap:15px">
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Delivery Rate</span><span>98.2%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:98%;height:100%;background:var(--grn);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Open Rate</span><span>64.5%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:64%;height:100%;background:var(--acc);border-radius:3px"></div></div></div>
+              <div style="margin-top:10px;padding:12px;background:var(--surf2);border-radius:10px;text-align:center">
+                <div style="font-size:24px;font-weight:800;color:var(--acc)">1,240</div>
+                <div style="font-size:11px;color:var(--mut);text-transform:uppercase">Total Reach Today</div>
               </div>
             </div>
           </div>
-          
+        </div>
+      </div>
+
+      <!-- ADMIN CAFETERIA -->
+      <div id="s-admin-cafeteria" class="screen">
+        <div class="fr mb16">
+          <div class="st">🍽️ Cafeteria Management</div>
+          <div style="display:flex;gap:10px">
+            <button class="btn rh" style="font-size:12px;padding:6px 12px" onclick="toast('📂','Importing CSV...')">Bulk Import</button>
+            <button class="btn btp rh" style="font-size:12px;padding:6px 12px" onclick="resetFoodForm();openM('mAddFood')">+ New Menu Item</button>
+          </div>
+        </div>
+        <div class="sr" style="grid-template-columns:2fr 1fr;gap:20px">
           <div class="card">
-            <div class="fr mb16" style="padding:0 4px">
-              <div style="font-weight:700">🕒 System Logs</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px;font-family:monospace;font-size:11px;color:var(--mut)">
-              <div style="padding:8px;border-left:2px solid var(--acc)">[SUCCESS] Firestore connected successfully</div>
-              <div style="padding:8px;border-left:2px solid var(--acc)">[AUTH] Admin session started for Sahil</div>
-              <div style="padding:8px;border-left:2px solid var(--acc)">[DB] Realtime listeners established</div>
-              <div id="sysLog" style="padding:8px;border-left:2px solid var(--mut)">[READY] Waiting for commands...</div>
+            <div class="fr mb16"><div style="font-weight:700">Full Menu Database</div><input type="text" class="inp" style="width:180px;font-size:12px;padding:6px 12px" placeholder="Search menu..."></div>
+            <div id="adminFoodList" style="display:flex;flex-direction:column;gap:12px">
+              <div class="noti" style="background:var(--bg2)">Loading menu database...</div>
             </div>
           </div>
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Meal Timings</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="fr"><span>Breakfast</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="08:00 - 10:00"></div>
+              <div class="fr"><span>Lunch</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="12:30 - 14:30"></div>
+              <div class="fr"><span>Dinner</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="19:30 - 21:30"></div>
+              <button class="btn btp rh" style="margin-top:10px;width:100%;font-size:12px" onclick="toast('✅','Timings updated!')">Update Schedule</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN CHAT CONTROL -->
+      <div id="s-admin-chat" class="screen">
+        <div class="st mb16">💬 Anonymous Chat Control</div>
+        <div class="sr" style="grid-template-columns:1fr 1fr;gap:20px">
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Global Chat Status</div>
+            <div style="padding:20px;background:var(--bg2);border-radius:16px;text-align:center;border:1.5px solid var(--bdr)">
+              <div style="font-size:14px;color:var(--mut);margin-bottom:10px">SYSTEM STATUS</div>
+              <div style="font-size:28px;font-weight:800;color:var(--grn);margin-bottom:20px">LIVE & ACTIVE</div>
+              <button class="btn rh" style="width:100%;padding:12px;color:var(--red);border-color:var(--red)" onclick="toast('⛔','Chat disabled globally.')">Shut Down Chat Globally</button>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Temporary Block / Timer</div>
+            <div class="fg"><label class="fl">Block Duration (Hours)</label><input class="inp" type="number" value="1" id="chatBlockHrs"></div>
+            <div class="fg"><label class="fl">Public Reason</label><input class="inp" type="text" placeholder="Under maintenance / Cooling period" id="chatBlockReason"></div>
+            <button class="btn btp rh" style="width:100%;padding:12px" onclick="toast('⏲️','Temporary block started.')">Apply Temporary Block</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN MODERATION -->
+      <div id="s-admin-moderate" class="screen">
+        <div class="st mb16">⚖️ Content Moderation</div>
+        <div class="sr" style="grid-template-columns:1fr 1fr;gap:20px">
+          <div class="card">
+            <div class="fr mb16">
+              <div style="font-weight:700">Flagged Questions</div>
+              <div class="tag red">2 REPORTS</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="noti" style="background:var(--bg2);border-left:4px solid var(--red)">
+                <div style="font-size:13px;font-weight:700;margin-bottom:4px">"Is the exam date fixed?"</div>
+                <div style="font-size:11px;color:var(--mut)">Reported for: Spam · 2 hours ago</div>
+                <div class="fr" style="margin-top:10px">
+                  <button class="btn rh" style="font-size:11px;padding:5px 10px;background:var(--red);color:#fff">Delete</button>
+                  <button class="btn rh" style="font-size:11px;padding:5px 10px">Dismiss</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="fr mb16">
+              <div style="font-weight:700">Lost & Found Moderation</div>
+              <div class="tag blu">ACTIVE</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px" id="adminLfList">
+              <div class="noti" style="background:var(--bg2)">Loading reports...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN HISTORY -->
+      <div id="s-admin-history" class="screen">
+        <div class="fr mb16">
+          <div class="st">📜 System Logs & Audit Trail</div>
+          <button class="btn rh" onclick="toast('📥','Exporting as PDF...')">Export Audit PDF</button>
+        </div>
+        <div class="card">
+          <div class="fr mb16" style="padding:0 4px">
+            <div style="font-weight:700">Full Action History</div>
+            <span class="tag tur">LAST 30 DAYS</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0" id="fullLogHistory">
+            <div style="padding:15px;border-left:2px solid var(--acc);background:var(--bg2);margin-bottom:2px">
+              <div class="fr"><span style="font-weight:700;font-size:13px">Admin Sahil updated Notice Board</span><span style="font-size:11px;color:var(--mut)">Just now</span></div>
+              <div style="font-size:11px;color:var(--mut);margin-top:3px">Changed Examination Schedule visibility to Public</div>
+            </div>
+            <div style="padding:15px;border-left:2px solid var(--mut);background:var(--bg2);margin-bottom:2px">
+              <div class="fr"><span style="font-weight:700;font-size:13px">Admin Sahil added Menu Item</span><span style="font-size:11px;color:var(--mut)">10 mins ago</span></div>
+              <div style="font-size:11px;color:var(--mut);margin-top:3px">Added: Paneer Tikka Masala (₹120)</div>
+            </div>
+            <div style="padding:15px;border-left:2px solid var(--mut);background:var(--bg2);margin-bottom:2px">
+              <div class="fr"><span style="font-weight:700;font-size:13px">System Login: Sahil002620Q</span><span style="font-size:11px;color:var(--mut)">25 mins ago</span></div>
+              <div style="font-size:11px;color:var(--mut);margin-top:3px">New session established via Web Console</div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="fr mb16">
+          <div class="st">👥 User Management</div>
+          <button class="btn btp rh" style="font-size:12px;padding:6px 12px" onclick="toast('🔧','Bulk operations coming soon!')">Bulk Edit</button>
+        </div>
+        <div class="card">
+          <div id="adminUserList" style="display:flex;flex-direction:column;gap:10px">
+            <div class="noti" style="background:var(--bg2)">
+              <div style="font-weight:700;font-size:13px">Fetching user database...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN ANALYTICS -->
+      <div id="s-admin-analytics" class="screen">
+        <div class="st mb16">📊 Engagement Analytics</div>
+        <div class="sr" style="grid-template-columns:1.5fr 1fr;gap:20px">
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Daily Active Users (Last 7 Days)</div>
+            <div style="height:200px;display:flex;align-items:flex-end;gap:15px;padding-top:20px">
+              <div style="flex:1;background:var(--acc);height:60%;border-radius:4px" title="Mon: 45"></div>
+              <div style="flex:1;background:var(--acc);height:80%;border-radius:4px" title="Tue: 62"></div>
+              <div style="flex:1;background:var(--acc);height:40%;border-radius:4px" title="Wed: 31"></div>
+              <div style="flex:1;background:var(--acc);height:90%;border-radius:4px" title="Thu: 75"></div>
+              <div style="flex:1;background:var(--acc);height:70%;border-radius:4px" title="Fri: 58"></div>
+              <div style="flex:1;background:var(--acc2);height:100%;border-radius:4px" title="Sat: 88"></div>
+              <div style="flex:1;background:var(--acc);height:20%;border-radius:4px" title="Sun: 12"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:15px">Feature Usage Share</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Notice Board</span><span>45%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:45%;height:100%;background:var(--acc);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Cafeteria</span><span>30%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:30%;height:100%;background:var(--acc2);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>AnonAsk</span><span>15%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:15%;height:100%;background:var(--red);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>LostFound</span><span>10%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:10%;height:100%;background:var(--blu);border-radius:3px"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN MODERATION -->
+      <div id="s-admin-moderate" class="screen">
+        <div class="st mb16">⚖️ Moderation Center</div>
+        <div class="sr" style="grid-template-columns:1fr 1fr;gap:20px">
+          <div class="card">
+            <div class="fr mb16">
+              <div style="font-weight:700">Flagged AnonAsk Questions</div>
+              <div class="tag red">2 PENDING</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="noti" style="background:var(--bg2);border-left:4px solid var(--red)">
+                <div style="font-size:13px;font-weight:700;margin-bottom:4px">"Is the exam date fixed?"</div>
+                <div style="font-size:11px;color:var(--mut)">Reported for: Spam · 2 hours ago</div>
+                <div class="fr" style="margin-top:10px">
+                  <button class="btn rh" style="font-size:11px;padding:5px 10px;background:var(--red);color:#fff">Delete</button>
+                  <button class="btn rh" style="font-size:11px;padding:5px 10px">Ignore</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="fr mb16">
+              <div style="font-weight:700">Lost & Found Reports</div>
+              <div class="tag blu">ACTIVE</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px" id="adminLfList">
+              <div class="noti" style="background:var(--bg2)">Loading reports...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN SETTINGS -->
+      <div id="s-admin-settings" class="screen">
+        <div class="st mb16">⚙️ System Settings</div>
+        <div class="card" style="max-width:500px">
+          <div class="fg">
+            <label class="fl">Maintenance Mode</label>
+            <div class="fr">
+              <span style="font-size:13px;color:var(--mut)">Disable all student logins</span>
+              <div class="ttog rh" onclick="toast('⚙️','Maintenance toggle requires API v2')"><div class="tknob"></div></div>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Announcement Alert</label>
+            <input class="inp" type="text" placeholder="Global banner message...">
+            <button class="btn btp rh" style="width:100%;margin-top:10px">Broadcast to All Users</button>
+          </div>
+          <hr style="margin:20px 0;border:none;border-top:1.5px solid var(--bdr)">
+          <button class="btn rh" style="width:100%;color:var(--red);border-color:var(--red)" onclick="toast('⚠️','System reset locked.')">Factory Reset Database</button>
         </div>
       </div>
 
@@ -702,6 +947,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 /* GLOBALS & AUTH STATE */
 let currentUser = null;
 let currentRole = 'student';
+let editingFoodId = null;
+let editingNoticeId = null;
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
@@ -797,8 +1044,12 @@ function showApp() {
 }
 
 function applyRoleVisibility() {
-  const isSuper = currentRole === 'super_admin';
+  const roll = currentUser.email.split('@')[0].toUpperCase();
+  const isSuper = currentRole === 'super_admin' && roll === 'SAHIL002620Q';
   const isCaf   = currentRole === 'cafeteria_admin' || isSuper;
+  
+  // Reset visibility first
+  document.getElementById('adminSidebar').style.display = 'none';
   
   // Cafeteria Add Button
   if (isCaf && !document.getElementById('adminCafBtn')) {
@@ -826,16 +1077,34 @@ function applyRoleVisibility() {
     }
   }
 
-  // Admin Sidebar Section
+  // Admin Sidebar Section - STRICT CHECK
   if (isSuper) {
     document.getElementById('adminSidebar').style.display = 'block';
     startAdminListeners();
+  } else {
+    document.getElementById('adminSidebar').style.display = 'none';
   }
 }
 
 /* NAVIGATION */
-const titles={home:'🏠 Home Feed',notices:'📋 Notice Board',cafeteria:'🍽️ Cafeteria',links:'🔗 Quick Links',anon:'👻 AnonAsk',lostfound:'🔍 Lost & Found',attendance:'✅ Attendance',library:'📚 Library',admin:'🛡️ Admin Control Center'};
+const titles={
+  home:'🏠 Home Feed',notices:'📋 Notice Board',cafeteria:'🍽️ Cafeteria',links:'🔗 Quick Links',
+  anon:'👻 AnonAsk',lostfound:'🔍 Lost & Found',attendance:'✅ Attendance',library:'📚 Library',
+  admin:'🛡️ Admin Dashboard','admin-users':'👥 User Management',
+  'admin-notices':'📋 Notice Board Management','admin-cafeteria':'🍽️ Cafeteria Management',
+  'admin-push':'🔔 Push Notifications','admin-chat':'💬 Chat Control',
+  'admin-analytics':'📊 Analytics Dashboard','admin-moderate':'⚖️ Moderation Center',
+  'admin-history':'📜 System Logs & History','admin-settings':'⚙️ System Settings'
+};
 function show(name){
+  if (name.startsWith('admin')) {
+    const roll = currentUser.email.split('@')[0].toUpperCase();
+    if (roll !== 'SAHIL002620Q' || currentRole !== 'super_admin') {
+      toast('🚫', 'Administrative Access Locked');
+      show('home');
+      return;
+    }
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const s=document.getElementById('s-'+name);
   if(s)s.classList.add('active');
@@ -843,8 +1112,16 @@ function show(name){
   if(name==='attendance')setTimeout(animateBars,100);
 }
 function goTo(el,name){
+  if (name.startsWith('admin')) {
+    const roll = currentUser.email.split('@')[0].toUpperCase();
+    if (roll !== 'SAHIL002620Q' || currentRole !== 'super_admin') {
+      toast('🚫', 'Access Denied: Owner Only');
+      return;
+    }
+  }
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');show(name);
+  if(el) el.classList.add('active');
+  show(name);
 }
 function goTN(name){
   show(name);
@@ -934,7 +1211,10 @@ function startCafeteriaListener() {
     .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
       menuItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const hStat = document.getElementById('homeStatMenu');
+      if(hStat) hStat.textContent = snap.size;
       renderMenu();
+      renderHomeCafe();
     }, e => {
       console.error(e);
       toast('❗','Failed to load cafeteria items');
@@ -957,6 +1237,19 @@ ftog = function(el) {
   else if(text.includes('Snacks')) setCafFilter('snack', el);
   else if(text.includes('Meals')) setCafFilter('lunch', el);
   else if(text.includes('Drinks')) setCafFilter('drinks', el);
+}
+
+function renderHomeCafe() {
+  const c = document.getElementById('homeCafeCard');
+  if(!c || !menuItems.length) return;
+  const item = menuItems[0];
+  c.innerHTML = `
+    <div class="fc rev d5 rh" onclick="goTN('cafeteria')">
+      <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(212,160,0,.15)">🔥</div><div><div style="font-size:13px;font-weight:700">Cafeteria Trending</div><div class="tmut" style="margin-top:1px">${item.category}</div></div><span class="tag tev mla">Special</span></div>
+      <div class="fcb"><div class="fct">${item.emoji} ${item.name} — ₹${item.price}</div><div class="fcs">Check out our latest and most popular campus meals!</div></div>
+      <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('cafeteria')">🍽️ View Full Menu</div></div>
+    </div>
+  `;
 }
 
 function renderMenu() {
@@ -1010,16 +1303,57 @@ async function submitFoodItem() {
   if (!name || !price) { toast('❗', 'Name and Price required!'); return; }
   
   try {
-    await db.collection('cafeteria_menu').add({
+    const data = {
       name, price: Number(price), category: cat,
-      available: avail, emoji, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    toast('✅', 'Food item added successfully!');
+      available: avail, emoji, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    if (editingFoodId) {
+      await db.collection('cafeteria_menu').doc(editingFoodId).update(data);
+      toast('✅', 'Item updated successfully!');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('cafeteria_menu').add(data);
+      toast('✅', 'Food item added successfully!');
+    }
+    
     closeM('mAddFood');
-    document.getElementById('fName').value = '';
-    document.getElementById('fPrice').value = '';
+    resetFoodForm();
   } catch(e) {
-    toast('❗', 'Failed to add item');
+    toast('❗', editingFoodId ? 'Failed to update' : 'Failed to add');
+  }
+}
+
+function resetFoodForm() {
+  editingFoodId = null;
+  document.getElementById('mAddFood').querySelector('.mdt').textContent = '➕ Add Food Item';
+  document.getElementById('fName').value = '';
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fEmoji').value = '';
+  document.getElementById('fAvail').value = 'true';
+}
+
+async function editFoodItem(id) {
+  editingFoodId = id;
+  const doc = await db.collection('cafeteria_menu').doc(id).get();
+  if (doc.exists) {
+    const f = doc.data();
+    document.getElementById('mAddFood').querySelector('.mdt').textContent = '✏️ Edit Food Item';
+    document.getElementById('fName').value = f.name;
+    document.getElementById('fPrice').value = f.price;
+    document.getElementById('fEmoji').value = f.emoji || '🍽️';
+    document.getElementById('fCat').value = f.category;
+    document.getElementById('fAvail').value = String(f.available);
+    openM('mAddFood');
+  }
+}
+
+async function toggleFoodAvailability(id, current) {
+  try {
+    await db.collection('cafeteria_menu').doc(id).update({ available: !current });
+    toast('🔄', 'Availability updated');
+  } catch(e) {
+    toast('❗', 'Update failed');
   }
 }
 
@@ -1062,8 +1396,44 @@ function startNoticeListener() {
     .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
       noticeItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const hStat = document.getElementById('homeStatNotices');
+      if(hStat) hStat.textContent = snap.size;
       renderNotices();
+      renderHomeNotice();
     }, e => console.error(e));
+}
+
+function renderHomeNotice() {
+  const c = document.getElementById('homeNoticeCard');
+  if(!c || !noticeItems.length) return;
+  const n = noticeItems[0];
+  const time = n.createdAt ? new Date(n.createdAt.toDate()).toLocaleDateString() : 'Today';
+  
+  let tagCls = 'tev';
+  if(n.category==='Exam') tagCls='tex';
+  else if(n.category==='Holiday') tagCls='tho';
+  else if(n.category==='Urgent') tagCls='tur';
+
+  c.innerHTML = `
+    <div class="fc rev d4 rh" onclick="openNoticeDetails('${n.id}')">
+      <div class="fch">
+        <div class="si" style="width:34px;height:34px;font-size:15px;background:rgba(192,57,43,.12)">📢</div>
+        <div>
+          <div style="font-size:13px;font-weight:700">Official Notice</div>
+          <div class="tmut" style="margin-top:1px">${time} · by ${n.author || 'Admin'}</div>
+        </div>
+        <span class="tag ${tagCls} mla">${n.category.toUpperCase()}</span>
+      </div>
+      <div class="fcb">
+        <div class="fct">${n.title}</div>
+        <div class="fcs">${n.content.length > 100 ? n.content.substring(0, 100) + '...' : n.content}</div>
+      </div>
+      <div class="fcf">
+        <div class="rb rh" onclick="event.stopPropagation();reactTog(this)">👍 Useful <span>1</span></div>
+        <div class="rb rh" onclick="event.stopPropagation();toast('🔔','Reminder set for this notice!')">🔔 Remind Me</div>
+      </div>
+    </div>
+  `;
 }
 
 function renderNotices() {
@@ -1104,16 +1474,45 @@ async function submitNotice() {
   if(!title || !content) { toast('❗','Title and content required!'); return; }
   
   try {
-    await db.collection('notices').add({
+    const data = {
       title, category: cat, content,
       author: currentUser.email.split('@')[0].toUpperCase(),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    toast('✅','Notice posted!');
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    if (editingNoticeId) {
+      await db.collection('notices').doc(editingNoticeId).update(data);
+      toast('✅','Notice updated!');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('notices').add(data);
+      toast('✅','Notice posted!');
+    }
+    
     closeM('mAddNotice');
-    document.getElementById('nTitle').value = '';
-    document.getElementById('nContent').value = '';
-  } catch(e) { toast('❗','Failed to post notice'); }
+    resetNoticeForm();
+  } catch(e) { toast('❗', editingNoticeId ? 'Failed to update' : 'Failed to post'); }
+}
+
+function resetNoticeForm() {
+  editingNoticeId = null;
+  document.getElementById('mAddNotice').querySelector('.mdt').textContent = '➕ Post Notice';
+  document.getElementById('nTitle').value = '';
+  document.getElementById('nContent').value = '';
+  document.getElementById('nCat').value = 'General';
+}
+
+async function editNotice(id) {
+  editingNoticeId = id;
+  const doc = await db.collection('notices').doc(id).get();
+  if (doc.exists) {
+    const n = doc.data();
+    document.getElementById('mAddNotice').querySelector('.mdt').textContent = '✏️ Edit Notice';
+    document.getElementById('nTitle').value = n.title;
+    document.getElementById('nContent').value = n.content;
+    document.getElementById('nCat').value = n.category;
+    openM('mAddNotice');
+  }
 }
 
 async function deleteNotice(id) {
@@ -1148,12 +1547,17 @@ let anonItems = [];
 let lfItems = [];
 
 function startMiscListeners() {
+  startCafeteriaListener();
+  startNoticeListener();
   db.collection('anon_ask').orderBy('createdAt','desc').onSnapshot(snap => {
     anonItems = snap.docs.map(d => ({id:d.id, ...d.data()}));
     renderAnonAsk();
+    renderHomeAnon();
   });
   db.collection('lost_found').orderBy('createdAt','desc').onSnapshot(snap => {
     lfItems = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    const hStat = document.getElementById('homeStatLost');
+    if(hStat) hStat.textContent = snap.size;
     renderLostFound();
   });
 }
@@ -1172,6 +1576,19 @@ function renderAnonAsk() {
       </div>
     `;
   }).join('');
+}
+
+function renderHomeAnon() {
+  const c = document.getElementById('homeAnonCard');
+  if(!c || !anonItems.length) return;
+  const a = anonItems[0];
+  c.innerHTML = `
+    <div class="fc rev d6 rh" onclick="goTN('anon')">
+      <div class="fch"><div class="si" style="width:34px;height:34px;font-size:15px;background:var(--tagbg)">👻</div><div><div style="font-size:13px;font-weight:700">AnonAsk — Latest</div><div class="tmut" style="margin-top:1px">${a.category}</div></div><span class="tag tev mla">Hot</span></div>
+      <div class="fcb"><div class="fct">"${a.content.substring(0,80)}..."</div><div class="fcs">Community answering anonymously</div></div>
+      <div class="fcf"><div class="rb rh" onclick="event.stopPropagation();goTN('anon')">Answer anonymously →</div></div>
+    </div>
+  `;
 }
 
 async function submitAnonAsk() {
@@ -1260,18 +1677,25 @@ async function submitLostFound() {
 /* ADMIN LISTENERS */
 let adminUnsubs = [];
 function startAdminListeners() {
-  // Clear previous
   adminUnsubs.forEach(u => u());
   adminUnsubs = [];
 
-  // Stats
   adminUnsubs.push(db.collection('user').onSnapshot(s => {
     document.getElementById('statUsers').textContent = s.size;
     renderAdminUserList(s.docs);
   }));
-  adminUnsubs.push(db.collection('notices').onSnapshot(s => document.getElementById('statNotices').textContent = s.size));
-  adminUnsubs.push(db.collection('cafeteria_menu').onSnapshot(s => document.getElementById('statMenu').textContent = s.size));
-  adminUnsubs.push(db.collection('lost_found').onSnapshot(s => document.getElementById('statLost').textContent = s.size));
+  adminUnsubs.push(db.collection('notices').onSnapshot(s => {
+    document.getElementById('statNotices').textContent = s.size;
+    renderAdminNoticeList(s.docs);
+  }));
+  adminUnsubs.push(db.collection('cafeteria_menu').onSnapshot(s => {
+    document.getElementById('statMenu').textContent = s.size;
+    renderAdminFoodList(s.docs);
+  }));
+  adminUnsubs.push(db.collection('lost_found').onSnapshot(s => {
+    document.getElementById('statLost').textContent = s.size;
+    renderAdminLfList(s.docs);
+  }));
 }
 
 function renderAdminUserList(docs) {
@@ -1279,10 +1703,72 @@ function renderAdminUserList(docs) {
   c.innerHTML = docs.map(d => {
     const u = d.data();
     return `
-      <div class="noti rh" style="background:var(--bg2);padding:12px">
-        <div style="font-weight:700">${u.name || 'Anonymous'}</div>
-        <div class="tmut" style="font-size:11px">Roll: ${u.rollNo || 'N/A'} · Role: ${u.role || 'student'}</div>
+      <div class="noti rh" style="background:var(--bg2);padding:12px;display:flex;align-items:center;gap:12px">
+        <div class="uava">${(u.name||'A')[0]}</div>
+        <div>
+          <div style="font-weight:700">${u.name || 'Anonymous'}</div>
+          <div class="tmut" style="font-size:11px">Roll: ${u.rollNo || 'N/A'} · <span class="tag tur" style="font-size:9px">${u.role || 'student'}</span></div>
+        </div>
         <div style="margin-left:auto"><button class="btn rh" style="font-size:10px;padding:4px 8px" onclick="toast('⚙️','Managing ${u.rollNo}...')">Edit</button></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAdminNoticeList(docs) {
+  const c = document.getElementById('adminNoticeList');
+  c.innerHTML = docs.map(d => {
+    const n = d.data();
+    const id = d.id;
+    const time = n.createdAt ? new Date(n.createdAt.toDate()).toLocaleDateString() : 'Recent';
+    return `
+      <div class="noti rh" style="background:var(--bg2);padding:12px;display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div style="font-weight:700">${n.title}</div>
+          <div class="tmut" style="font-size:11px">${n.category} · ${time} · by ${n.author || 'Admin'}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn rh" style="font-size:10px;padding:4px 8px" onclick="editNotice('${id}')">Edit</button>
+          <button class="btn rh" style="font-size:10px;padding:4px 8px;color:var(--red)" onclick="deleteNotice('${id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAdminFoodList(docs) {
+  const c = document.getElementById('adminFoodList');
+  c.innerHTML = docs.map(d => {
+    const f = d.data();
+    const id = d.id;
+    return `
+      <div class="noti rh" style="background:var(--bg2);padding:12px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">${f.emoji || '🍽️'}</div>
+        <div style="flex:1">
+          <div style="font-weight:700">${f.name}</div>
+          <div class="tmut" style="font-size:11px">₹${f.price} · ${f.category} · <span style="color:${f.available?'var(--grn)':'var(--red)'};font-weight:800">${f.available?'Available':'Sold Out'}</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn rh" style="font-size:10px;padding:4px 8px;border:1px solid var(--acc)" onclick="toggleFoodAvailability('${id}', ${f.available})">${f.available?'Set Sold Out':'Set Available'}</button>
+          <button class="btn rh" style="font-size:10px;padding:4px 8px" onclick="editFoodItem('${id}')">Edit</button>
+          <button class="btn rh" style="font-size:10px;padding:4px 8px;color:var(--red)" onclick="deleteFoodItem('${id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAdminLfList(docs) {
+  const c = document.getElementById('adminLfList');
+  c.innerHTML = docs.map(d => {
+    const i = d.data();
+    return `
+      <div class="noti rh" style="background:var(--bg2);padding:10px;font-size:12px">
+        <div style="font-weight:700">${i.name}</div>
+        <div class="tmut">${i.type} · ${i.location}</div>
+        <div class="fr" style="margin-top:6px">
+          <button class="btn rh" style="font-size:10px;padding:3px 8px;color:var(--red)" onclick="toast('🗑️','Deleting...')">Delete</button>
+        </div>
       </div>
     `;
   }).join('');
