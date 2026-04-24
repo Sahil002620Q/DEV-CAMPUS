@@ -40,7 +40,7 @@ auth.onAuthStateChanged(async (user) => {
 
 async function loadUserRole(uid) {
   try {
-    const snap = await db.collection('users').doc(uid).get();
+    const snap = await db.collection('user').doc(uid).get();
     currentRole = snap.exists ? (snap.data().role || 'student') : 'student';
   } catch { currentRole = 'student'; }
 }

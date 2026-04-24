@@ -457,6 +457,45 @@ input:checked + .toggle-slider::before { transform: translateX(20px); }
 .c-green  { background: rgba(16,185,129,0.15); color: var(--accent4); }
 .c-red    { background: rgba(239,68,68,0.15);  color: var(--danger); }
 
+/* ── ANON CHAT REPLIES (YouTube Style) ── */
+.reply-container {
+  margin-left: 40px;
+  position: relative;
+  border-left: 2px solid var(--border);
+  padding-left: 20px;
+  margin-top: 10px;
+  display: none;
+}
+.reply-container.open { display: block; }
+
+.reply-branch {
+  position: absolute;
+  left: 0;
+  top: 15px;
+  width: 15px;
+  height: 2px;
+  background: var(--border);
+}
+
+.toggle-replies {
+  margin-left: 54px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.toggle-replies:hover { opacity: 0.8; }
+.toggle-replies i { transition: transform 0.2s; font-style: normal; }
+.toggle-replies.open i { transform: rotate(180deg); }
+
+.ac { position: relative; margin-bottom: 16px; }
+.ac-reply { border-left: none !important; margin-left: 54px !important; margin-top: 8px; background: transparent !important; padding: 0 !important; }
+
 @keyframes scaleIn { from{ opacity:0; transform:scale(0.95); } to{ opacity:1; transform:scale(1); } }
 
 /* ── RESPONSIVE ── */
@@ -467,5 +506,25 @@ input:checked + .toggle-slider::before { transform: translateX(20px); }
 @media(max-width:640px) {
   .sidebar { display: none; }
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
-  .content { padding: 16px; }
+  .content { padding: 16px; padding-bottom: 90px; }
+  .bottom-nav { display: flex; }
 }
+
+/* ── BOTTOM NAV (Mobile Only) ── */
+.bottom-nav {
+  display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+  background: var(--navbg); border-top: 1.5px solid var(--border);
+  height: 68px; align-items: center; justify-content: space-around;
+  z-index: 200; backdrop-filter: blur(12px);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+}
+.bn-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  color: var(--muted); cursor: pointer; transition: all 0.2s;
+  padding: 8px 12px; border-radius: 12px;
+}
+.bn-item.active { color: var(--accent); }
+.bn-icon { font-size: 24px; }
+.bn-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.bn-item:active { transform: scale(0.9); background: var(--surface2); }

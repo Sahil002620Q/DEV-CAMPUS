@@ -11,7 +11,7 @@ service cloud.firestore {
     }
 
     function userRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return get(/databases/$(database)/documents/user/$(request.auth.uid)).data.role;
     }
 
     function isSuperAdmin() {
@@ -26,10 +26,14 @@ service cloud.firestore {
       return isSignedIn() && (userRole() == "library_admin" || userRole() == "super_admin");
     }
 
+    function isAdmin() {
+      return isSignedIn() && (userRole() == "admin" || userRole() == "super_admin");
+    }
+
     // ────────────────────────────────────────────
-    // Users collection
+    // User collection (singular)
     // ────────────────────────────────────────────
-    match /users/{uid} {
+    match /user/{uid} {
       // Users can read their own doc; super_admin can read all
       allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
 
@@ -58,9 +62,7 @@ service cloud.firestore {
     // Cafeteria menu
     // ────────────────────────────────────────────
     match /cafeteria_menu/{itemId} {
-      // All signed-in users can read the menu
       allow read: if isSignedIn();
-      // Only cafeteria_admin or super_admin can write
       allow create, update, delete: if isCafeteriaAdmin();
     }
 
@@ -68,10 +70,41 @@ service cloud.firestore {
     // Library
     // ────────────────────────────────────────────
     match /library/{resourceId} {
-      // All signed-in users can read library entries
       allow read: if isSignedIn();
-      // Only library_admin or super_admin can write
       allow create, update, delete: if isLibraryAdmin();
+    }
+
+    // ────────────────────────────────────────────
+    // Notices
+    // ────────────────────────────────────────────
+    match /notices/{noticeId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────
+    // Anonymous Ask
+    // ────────────────────────────────────────────
+    match /anon_ask/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      // Only the author or any admin can delete
+      allow delete: if isAdmin();
+      allow update: if isSignedIn();
+    }
+
+    // ────────────────────────────────────────────
+    // Lost and Found
+    // ────────────────────────────────────────────
+    match /lost_found/{itemId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+
+      match /messages/{msgId} {
+        allow read, create: if isSignedIn();
+      }
     }
   }
 }
