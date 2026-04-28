@@ -763,15 +763,15 @@ body { overscroll-behavior-y: contain; }
             <div style="font-weight:700;margin-bottom:15px">Global Chat Status</div>
             <div style="padding:20px;background:var(--bg2);border-radius:16px;text-align:center;border:1.5px solid var(--bdr)">
               <div style="font-size:14px;color:var(--mut);margin-bottom:10px">SYSTEM STATUS</div>
-              <div style="font-size:28px;font-weight:800;color:var(--grn);margin-bottom:20px">LIVE & ACTIVE</div>
-              <button class="btn rh" style="width:100%;padding:12px;color:var(--red);border-color:var(--red)" onclick="toast('⛔','Chat disabled globally.')">Shut Down Chat Globally</button>
+              <div style="font-size:28px;font-weight:800;color:var(--grn);margin-bottom:20px" id="globalChatStatus">LIVE & ACTIVE</div>
+              <button class="btn rh" style="width:100%;padding:12px;color:var(--red);border-color:var(--red)" id="chatToggleBtn" onclick="toggleGlobalChat()">Shut Down Chat Globally</button>
             </div>
           </div>
           <div class="card">
             <div style="font-weight:700;margin-bottom:15px">Temporary Block / Timer</div>
             <div class="fg"><label class="fl">Block Duration (Hours)</label><input class="inp" type="number" value="1" id="chatBlockHrs"></div>
             <div class="fg"><label class="fl">Public Reason</label><input class="inp" type="text" placeholder="Under maintenance / Cooling period" id="chatBlockReason"></div>
-            <button class="btn btp rh" style="width:100%;padding:12px" onclick="toast('⏲️','Temporary block started.')">Apply Temporary Block</button>
+            <button class="btn btp rh" style="width:100%;padding:12px" onclick="applyTempBlock()">Apply Temporary Block</button>
           </div>
         </div>
       </div>
@@ -783,17 +783,10 @@ body { overscroll-behavior-y: contain; }
           <div class="card">
             <div class="fr mb16">
               <div style="font-weight:700">Flagged Questions</div>
-              <div class="tag red">2 REPORTS</div>
+              <div class="tag red" id="reportCountBadge">0 REPORTS</div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <div class="noti" style="background:var(--bg2);border-left:4px solid var(--red)">
-                <div style="font-size:13px;font-weight:700;margin-bottom:4px">"Is the exam date fixed?"</div>
-                <div style="font-size:11px;color:var(--mut)">Reported for: Spam · 2 hours ago</div>
-                <div class="fr" style="margin-top:10px">
-                  <button class="btn rh" style="font-size:11px;padding:5px 10px;background:var(--red);color:#fff">Delete</button>
-                  <button class="btn rh" style="font-size:11px;padding:5px 10px">Dismiss</button>
-                </div>
-              </div>
+            <div style="display:flex;flex-direction:column;gap:12px" id="adminReportedList">
+              <div class="noti" style="background:var(--bg2)">Loading...</div>
             </div>
           </div>
           <div class="card">
@@ -834,6 +827,8 @@ body { overscroll-behavior-y: contain; }
             </div>
           </div>
         </div>
+      </div>
+
       <!-- ADMIN USERS -->
       <div id="s-admin-users" class="screen">
         <div class="fr mb16">
@@ -867,11 +862,11 @@ body { overscroll-behavior-y: contain; }
           </div>
           <div class="card">
             <div style="font-weight:700;margin-bottom:15px">Feature Usage Share</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Notice Board</span><span>45%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:45%;height:100%;background:var(--acc);border-radius:3px"></div></div></div>
-              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Cafeteria</span><span>30%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:30%;height:100%;background:var(--acc2);border-radius:3px"></div></div></div>
-              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>AnonAsk</span><span>15%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:15%;height:100%;background:var(--red);border-radius:3px"></div></div></div>
-              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>LostFound</span><span>10%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:10%;height:100%;background:var(--blu);border-radius:3px"></div></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px" id="featureUsageShare">
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Notice Board</span><span>0%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:0%;height:100%;background:var(--acc);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Cafeteria</span><span>0%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:0%;height:100%;background:var(--acc2);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>AnonAsk</span><span>0%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:0%;height:100%;background:var(--red);border-radius:3px"></div></div></div>
+              <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>LostFound</span><span>0%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:0%;height:100%;background:var(--blu);border-radius:3px"></div></div></div>
             </div>
           </div>
         </div>
@@ -887,7 +882,7 @@ body { overscroll-behavior-y: contain; }
             <label class="fl">Maintenance Mode</label>
             <div class="fr">
               <span style="font-size:13px;color:var(--mut)">Disable all student logins</span>
-              <div class="ttog rh" onclick="toast('⚙️','Maintenance toggle requires API v2')"><div class="tknob"></div></div>
+              <div class="ttog rh" id="maintToggle" onclick="toggleMaintenance()"><div class="tknob"></div></div>
             </div>
           </div>
           <div class="fg">
@@ -901,10 +896,10 @@ body { overscroll-behavior-y: contain; }
           <div class="fg" style="margin-top:20px">
             <label class="fl">Announcement Alert</label>
             <input class="inp" type="text" placeholder="Global banner message..." id="setGlobalBanner">
-            <button class="btn btp rh" style="width:100%;margin-top:10px" onclick="toast('📣','Global broadcast active!')">Broadcast to All Users</button>
+            <button class="btn btp rh" style="width:100%;margin-top:10px" onclick="setGlobalBanner()">Broadcast to All Users</button>
           </div>
           <hr style="margin:20px 0;border:none;border-top:1.5px solid var(--bdr)">
-          <button class="btn rh" style="width:100%;color:var(--red);border-color:var(--red)" onclick="toast('⚠️','System reset locked.')">Factory Reset Database</button>
+          <button class="btn rh" style="width:100%;color:var(--red);border-color:var(--red)" onclick="clearSystemLogs()">Clear All System Logs</button>
         </div>
       </div>
 
@@ -1057,6 +1052,8 @@ let replyingToId = null;
 let openedReplyIds = new Set();
 let noticeFilter = 'all';
 let anonFilter = 'all';
+let globalSettings = {};
+let globalSettingsUnsub = null;
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
@@ -1137,6 +1134,15 @@ async function doLogin(btn){
 }
 
 function showApp() {
+  if (!globalSettingsUnsub) {
+    globalSettingsUnsub = db.collection('system_settings').doc('global').onSnapshot(snap => {
+      if(snap.exists) {
+        globalSettings = snap.data();
+        applyGlobalSettings();
+      }
+    });
+  }
+
   document.getElementById('loginPage').style.display='none';
   document.getElementById('mainApp').style.display='flex';
   document.getElementById('FAB').style.display='flex';
@@ -1159,6 +1165,46 @@ function showApp() {
   applyRoleVisibility();
   toast('🎓','Welcome, ' + name + '!');
   animateBars();
+}
+
+function applyGlobalSettings() {
+  if (globalSettings.maintenanceMode && currentRole === 'student') {
+    doLogout();
+    setTimeout(() => {
+      document.getElementById('loginError').textContent = "System is under maintenance. Please try again later.";
+      document.getElementById('loginError').style.display = 'block';
+    }, 500);
+    return;
+  }
+  
+  if (globalSettings.globalBanner) {
+    const b = document.getElementById('globalBannerAlert');
+    if (!b) {
+      const banner = document.createElement('div');
+      banner.id = 'globalBannerAlert';
+      banner.className = 'banner rev d1';
+      banner.style = "background:rgba(212,160,0,0.15);border-color:var(--acc);margin:10px 26px 0;z-index:100;animation:slideL .5s ease both;";
+      banner.innerHTML = `<div class="ban-ico">📣</div><div class="ban-t"><strong>Global Announcement</strong><span>${globalSettings.globalBanner}</span></div><div class="ban-x rh" onclick="this.parentElement.remove()">✕</div>`;
+      const main = document.querySelector('.main');
+      main.insertBefore(banner, main.querySelector('.content'));
+    } else {
+      b.querySelector('.ban-t span').textContent = globalSettings.globalBanner;
+    }
+  } else {
+    const b = document.getElementById('globalBannerAlert');
+    if(b) b.remove();
+  }
+}
+
+function addSystemLog(action, details) {
+  if (currentRole !== 'super_admin' && currentRole !== 'admin' && currentRole !== 'cafeteria_admin') return;
+  const name = currentUser.email.split('@')[0].toUpperCase();
+  db.collection('system_logs').add({
+    action,
+    details,
+    adminName: name,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(e => console.error("Log error", e));
 }
 
 async function updatePassword() {
@@ -1479,10 +1525,12 @@ async function submitFoodItem() {
     if (editingFoodId) {
       await db.collection('cafeteria_menu').doc(editingFoodId).update(data);
       toast('✅', 'Item updated successfully!');
+      addSystemLog('CAFETERIA', 'Updated item: ' + name);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection('cafeteria_menu').add(data);
       toast('✅', 'Food item added successfully!');
+      addSystemLog('CAFETERIA', 'Added item: ' + name);
     }
     
     closeM('mAddFood');
@@ -1520,6 +1568,7 @@ async function toggleFoodAvailability(id, current) {
   try {
     await db.collection('cafeteria_menu').doc(id).update({ available: !current });
     toast('🔄', 'Availability updated');
+    addSystemLog('CAFETERIA', 'Toggled availability for item');
   } catch(e) {
     toast('❗', 'Update failed');
   }
@@ -1536,6 +1585,7 @@ async function deleteFoodItem(id) {
     try {
       await db.collection('cafeteria_menu').doc(id).delete();
       toast('🗑️', 'Item deleted');
+      addSystemLog('CAFETERIA', 'Deleted menu item');
       closeM('mConfirm');
     } catch(e) { toast('❗', e.message); }
     finally { btn.disabled = false; btn.textContent = "Confirm"; }
@@ -1672,10 +1722,12 @@ async function submitNotice() {
     if (editingNoticeId) {
       await db.collection('notices').doc(editingNoticeId).update(data);
       toast('✅','Notice updated!');
+      addSystemLog('NOTICE', 'Updated notice: ' + title);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection('notices').add(data);
       toast('✅','Notice posted!');
+      addSystemLog('NOTICE', 'Posted new notice: ' + title);
     }
     
     closeM('mAddNotice');
@@ -1715,6 +1767,7 @@ async function deleteNotice(id) {
     try {
       await db.collection('notices').doc(id).delete();
       toast('🗑️','Notice deleted');
+      addSystemLog('NOTICE', 'Deleted a notice');
       closeM('mConfirm');
     } catch(e) { toast('❗', e.message); }
     finally { btn.disabled = false; btn.textContent = "Confirm"; }
@@ -1801,7 +1854,7 @@ function renderAnonAsk() {
           <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();upvoteAnon('${item.id}', ${item.upvotes||0})">
             <span class="ms" style="font-size:16px">thumb_up</span> <span style="font-weight:600">${item.upvotes||0}</span>
           </div>
-          <div style="cursor:pointer;font-size:16px;color:var(--mut)" class="ms" onclick="event.stopPropagation();toast('👍','Feedback recorded')">thumb_down</div>
+          <div style="cursor:pointer;font-size:16px;color:var(--mut)" class="ms" onclick="event.stopPropagation();reportAnonPost('${item.id}')" title="Report">flag</div>
           <div style="font-size:12px;font-weight:700;color:var(--text);cursor:pointer" onclick="setReplyMode('${item.id}', '${item.alias}')">Reply</div>
           <button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:6px 12px;font-size:11px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${item.id}" onclick="handleDelete(this, event)">Delete</button>
         </div>
@@ -1823,8 +1876,8 @@ function renderAnonAsk() {
                   </div>
                   <div class="aq" style="font-size:13px;margin-top:4px">${r.content}</div>
                   <div style="display:flex;gap:16px;margin-top:8px;align-items:center">
-                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer">thumb_up</div>
-                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer">thumb_down</div>
+                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();upvoteAnon('${r.id}', ${r.upvotes||0})">thumb_up</div>
+                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();reportAnonPost('${r.id}')" title="Report">flag</div>
                     <div style="font-size:11px;font-weight:700;color:var(--mut);cursor:pointer">Reply</div>
                     <button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:4px 8px;font-size:10px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${r.id}" onclick="handleDelete(this, event)">Delete</button>
                   </div>
@@ -1952,6 +2005,7 @@ function updateHomeLimit() {
 }
 
 async function submitAnonAsk() {
+  if (globalSettings && globalSettings.chatDisabled) return toast('⛔', 'Chat is currently disabled by Administrators.');
   const content = document.getElementById('aContent').value.trim();
   const cat = document.getElementById('aCat').value;
   if(!content) return toast('❗','Content is empty!');
@@ -2139,6 +2193,7 @@ async function deleteLfItem(id) {
 
 /* ADMIN LISTENERS */
 let adminUnsubs = [];
+let anonCount = 0;
 function startAdminListeners() {
   adminUnsubs.forEach(u => u());
   adminUnsubs = [];
@@ -2150,15 +2205,122 @@ function startAdminListeners() {
   adminUnsubs.push(db.collection('notices').onSnapshot(s => {
     document.getElementById('statNotices').textContent = s.size;
     renderAdminNoticeList(s.docs);
+    calculateAnalytics(s.size, null, null, null);
   }));
   adminUnsubs.push(db.collection('cafeteria_menu').onSnapshot(s => {
     document.getElementById('statMenu').textContent = s.size;
     renderAdminFoodList(s.docs);
+    calculateAnalytics(null, s.size, null, null);
   }));
   adminUnsubs.push(db.collection('lost_found').onSnapshot(s => {
     document.getElementById('statLost').textContent = s.size;
     renderAdminLfList(s.docs);
+    calculateAnalytics(null, null, null, s.size);
   }));
+  adminUnsubs.push(db.collection('anon_ask').onSnapshot(s => {
+    anonCount = s.size;
+    calculateAnalytics(null, null, anonCount, null);
+    renderReportedPosts(s.docs);
+  }));
+  adminUnsubs.push(db.collection('system_logs').orderBy('timestamp', 'desc').limit(50).onSnapshot(s => {
+    renderSystemLogs(s.docs);
+  }));
+}
+
+let aNotices=0, aMenu=0, aAnon=0, aLost=0;
+function calculateAnalytics(n, m, a, l) {
+  if(n!==null) aNotices = n;
+  if(m!==null) aMenu = m;
+  if(a!==null) aAnon = a;
+  if(l!==null) aLost = l;
+  
+  const total = aNotices + aMenu + aAnon + aLost || 1; // avoid / 0
+  const pNot = Math.round((aNotices/total)*100);
+  const pMen = Math.round((aMenu/total)*100);
+  const pAno = Math.round((aAnon/total)*100);
+  const pLos = Math.round((aLost/total)*100);
+  
+  const fs = document.getElementById('featureUsageShare');
+  if(fs) {
+    fs.innerHTML = `
+      <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Notice Board</span><span>${pNot}%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:${pNot}%;height:100%;background:var(--acc);border-radius:3px;transition:width 0.5s ease"></div></div></div>
+      <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>Cafeteria</span><span>${pMen}%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:${pMen}%;height:100%;background:var(--acc2);border-radius:3px;transition:width 0.5s ease"></div></div></div>
+      <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>AnonAsk</span><span>${pAno}%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:${pAno}%;height:100%;background:var(--red);border-radius:3px;transition:width 0.5s ease"></div></div></div>
+      <div><div class="fr" style="font-size:12px;margin-bottom:4px"><span>LostFound</span><span>${pLos}%</span></div><div style="height:6px;background:var(--bg2);border-radius:3px"><div style="width:${pLos}%;height:100%;background:var(--blu);border-radius:3px;transition:width 0.5s ease"></div></div></div>
+    `;
+  }
+}
+
+function renderSystemLogs(docs) {
+  const dashLog = document.getElementById('sysLog');
+  const fullLog = document.getElementById('fullLogHistory');
+  
+  if(docs.length === 0) {
+    if(fullLog) fullLog.innerHTML = '<div style="padding:15px;color:var(--mut);text-align:center">No system logs.</div>';
+    return;
+  }
+  
+  // Dashboard takes top 3
+  if(dashLog && docs.length > 0) {
+    const d = docs[0].data();
+    dashLog.innerHTML = `[${d.action}] ${d.details} (by ${d.adminName})`;
+  }
+  
+  if(fullLog) {
+    fullLog.innerHTML = docs.map(doc => {
+      const d = doc.data();
+      const time = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleString() : 'Just now';
+      return `
+        <div style="padding:15px;border-left:2px solid var(--acc);background:var(--bg2);margin-bottom:2px">
+          <div class="fr"><span style="font-weight:700;font-size:13px">Admin ${d.adminName} performed ${d.action}</span><span style="font-size:11px;color:var(--mut)">${time}</span></div>
+          <div style="font-size:11px;color:var(--mut);margin-top:3px">${d.details}</div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+async function toggleMaintenance() {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  const newState = !globalSettings.maintenanceMode;
+  await db.collection('system_settings').doc('global').set({ maintenanceMode: newState }, { merge: true });
+  addSystemLog('SYSTEM', 'Toggled Maintenance Mode to: ' + newState);
+  toast('✅', 'Maintenance mode updated');
+  const knob = document.querySelector('#maintToggle .tknob');
+  if(knob) knob.style.transform = newState ? 'translateX(23px)' : 'translateX(0)';
+  if(knob) knob.parentElement.style.background = newState ? 'var(--red)' : 'var(--surf3)';
+}
+
+async function setGlobalBanner() {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  const txt = document.getElementById('setGlobalBanner').value.trim();
+  await db.collection('system_settings').doc('global').set({ globalBanner: txt }, { merge: true });
+  addSystemLog('SYSTEM', 'Updated global banner');
+  toast('📣', 'Global banner updated!');
+  document.getElementById('setGlobalBanner').value = '';
+}
+
+async function clearSystemLogs() {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  toast('⚠️', 'Clearing logs is disabled for security audit reasons.');
+  addSystemLog('SYSTEM', 'Attempted to clear system logs');
+}
+
+async function deleteUser(uid, rollNo) {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  const btn = document.getElementById('confirmActionBtn');
+  document.getElementById('confirmText').textContent = "Delete user " + rollNo + "? This removes their data from Firestore.";
+  openM('mConfirm');
+  btn.onclick = async () => {
+    btn.disabled = true;
+    try {
+      await db.collection('user').doc(uid).delete();
+      toast('🗑️', 'User deleted');
+      addSystemLog('USER', 'Deleted user: ' + rollNo);
+      closeM('mConfirm');
+    } catch(e) { toast('❗', e.message); }
+    finally { btn.disabled = false; btn.textContent = "Confirm"; }
+  };
 }
 
 function renderAdminUserList(docs) {
@@ -2172,7 +2334,9 @@ function renderAdminUserList(docs) {
           <div style="font-weight:700">${u.name || 'Anonymous'}</div>
           <div class="tmut" style="font-size:11px">Roll: ${u.rollNo || 'N/A'} · <span class="tag tur" style="font-size:9px">${u.role || 'student'}</span></div>
         </div>
-        <div style="margin-left:auto"><button class="btn rh" style="font-size:10px;padding:4px 8px" onclick="toast('⚙️','Managing ${u.rollNo}...')">Edit</button></div>
+        <div style="margin-left:auto">
+          <button class="btn rh" style="font-size:10px;padding:4px 8px;color:var(--red);border:1px solid var(--red)" onclick="deleteUser('${d.id}', '${u.rollNo}')">Delete</button>
+        </div>
       </div>
     `;
   }).join('');
@@ -2235,6 +2399,69 @@ function renderAdminLfList(docs) {
       </div>
     `;
   }).join('');
+}
+
+async function toggleGlobalChat() {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  const newState = !globalSettings.chatDisabled;
+  await db.collection('system_settings').doc('global').set({ chatDisabled: newState }, { merge: true });
+  addSystemLog('SYSTEM', 'Toggled global chat disabled to: ' + newState);
+  toast('✅', 'Chat status updated');
+  const st = document.getElementById('globalChatStatus');
+  const btn = document.getElementById('chatToggleBtn');
+  if(st) { st.textContent = newState ? "DISABLED" : "LIVE & ACTIVE"; st.style.color = newState ? "var(--red)" : "var(--grn)"; }
+  if(btn) btn.textContent = newState ? "Enable Chat Globally" : "Shut Down Chat Globally";
+}
+
+async function applyTempBlock() {
+  if (currentRole !== 'super_admin') return toast('❗', 'Super Admin only');
+  toast('⏲️', 'Temporary block requires Cloud Functions. Mocked success.');
+  addSystemLog('SYSTEM', 'Applied temporary block mock');
+}
+
+function renderReportedPosts(docs) {
+  const list = document.getElementById('adminReportedList');
+  if(!list) return;
+  const reported = docs.map(d => ({id:d.id, ...d.data()})).filter(d => d.isReported === true);
+  
+  if (reported.length === 0) {
+    list.innerHTML = '<div style="padding:15px;color:var(--mut)">No flagged posts.</div>';
+    document.getElementById('reportCountBadge').textContent = '0 REPORTS';
+    return;
+  }
+  
+  document.getElementById('reportCountBadge').textContent = reported.length + ' REPORTS';
+  
+  list.innerHTML = reported.map(r => {
+    const time = r.createdAt ? new Date(r.createdAt.toDate()).toLocaleString() : 'Just now';
+    return `
+      <div class="noti" style="background:var(--bg2);border-left:4px solid var(--red)">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px">"${r.content}"</div>
+          <div style="font-size:11px;color:var(--mut)">Reported by users · ${time}</div>
+          <div class="fr" style="margin-top:10px">
+            <button class="btn rh" style="font-size:11px;padding:5px 10px;background:var(--red);color:#fff" onclick="deleteReported('${r.id}')">Delete Post</button>
+            <button class="btn rh" style="font-size:11px;padding:5px 10px;border:1px solid var(--bdr)" onclick="dismissReport('${r.id}')">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function dismissReport(id) {
+  await db.collection('anon_ask').doc(id).update({ isReported: false });
+  toast('✅', 'Report dismissed');
+}
+
+async function deleteReported(id) {
+  await db.collection('anon_ask').doc(id).delete();
+  toast('🗑️', 'Post deleted');
+}
+
+function reportAnonPost(id) {
+  db.collection('anon_ask').doc(id).update({ isReported: true });
+  toast('🚩', 'Post has been reported to admins.');
 }
 
 // Start listening after auth loads and role is applied
