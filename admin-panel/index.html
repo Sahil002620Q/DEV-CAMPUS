@@ -744,11 +744,10 @@ body { overscroll-behavior-y: contain; }
             </div>
           </div>
           <div class="card">
-            <div style="font-weight:700;margin-bottom:15px">Meal Timings</div>
+            <div style="font-weight:700;margin-bottom:15px">Cafeteria Timings</div>
             <div style="display:flex;flex-direction:column;gap:12px">
-              <div class="fr"><span>Breakfast</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="08:00 - 10:00"></div>
-              <div class="fr"><span>Lunch</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="12:30 - 14:30"></div>
-              <div class="fr"><span>Dinner</span><input type="text" class="inp" style="width:90px;font-size:11px;padding:4px 8px" value="19:30 - 21:30"></div>
+              <div class="fr"><span>Open Time</span><input type="time" class="inp" style="width:100px;font-size:11px;padding:4px 8px" value="08:00"></div>
+              <div class="fr"><span>Close Time</span><input type="time" class="inp" style="width:100px;font-size:11px;padding:4px 8px" value="22:00"></div>
               <button class="btn btp rh" style="margin-top:10px;width:100%;font-size:12px" onclick="toast('✅','Timings updated!')">Update Schedule</button>
             </div>
           </div>
@@ -1261,6 +1260,8 @@ function applyRoleVisibility() {
   } else {
     document.getElementById('adminSidebar').style.display = 'none';
   }
+  if (typeof renderMenu === 'function') renderMenu();
+  if (typeof renderAnonAsk === 'function') renderAnonAsk();
 }
 
 /* NAVIGATION */
@@ -1484,6 +1485,7 @@ function renderMenu() {
   grid.innerHTML = list.map(item => {
     const isAvail = item.available !== false;
     const adminControls = isCaf ? `<div style="position:absolute;top:8px;left:8px;z-index:10;display:flex;gap:4px">
+      <div class="rb rh" style="padding:4px;font-size:11px" onclick="event.stopPropagation();editFoodItem('${item.id}')"><span class="ms" style="font-size:14px">edit</span></div>
       <div class="rb rh" style="padding:4px;font-size:11px" onclick="event.stopPropagation();deleteFoodItem('${item.id}')"><span class="ms" style="font-size:14px">delete</span></div>
     </div>` : '';
     
@@ -1492,7 +1494,7 @@ function renderMenu() {
         ${adminControls}
         <div class="ft" style="background:linear-gradient(135deg,#fffde7,#fff3e0); ${!isAvail ? 'opacity:0.65;' : ''}">
           <span class="ms" style="font-size:48px">${item.emoji || 'restaurant'}</span>
-          ${isAvail ? '<span class="fav avy">Available</span>' : '<span class="fav avn">Sold Out</span>'}
+          ${isAvail ? `<span class="fav avy" style="${isCaf ? 'cursor:pointer' : ''}" onclick="${isCaf ? `event.stopPropagation();toggleFoodAvailability('${item.id}', true)` : ''}">Available</span>` : `<span class="fav avn" style="${isCaf ? 'cursor:pointer' : ''}" onclick="${isCaf ? `event.stopPropagation();toggleFoodAvailability('${item.id}', false)` : ''}">Sold Out</span>`}
         </div>
         <div class="fb" style="${!isAvail ? 'opacity:0.6;' : ''}">
           <div class="fn">${item.name}</div>
@@ -1596,7 +1598,7 @@ function openFoodDetails(id) {
   const item = menuItems.find(i => i.id === id);
   if(!item) return;
   document.getElementById('vFoodName').textContent = item.name;
-  document.getElementById('vFoodIco').innerHTML = `<span class="ms" style="font-size:40px">restaurant</span>`;
+  document.getElementById('vFoodIco').innerHTML = `<span class="ms" style="font-size:40px">${item.emoji || 'restaurant'}</span>`;
   document.getElementById('vFoodPrice').textContent = '₹' + item.price;
   
   const st = document.getElementById('vFoodStatus');
@@ -1605,6 +1607,36 @@ function openFoodDetails(id) {
   } else {
     st.className = 'tag tex'; st.textContent = 'Sold Out';
   }
+
+  // Admin Controls inside Modal
+  const isCaf = currentRole === 'cafeteria_admin' || currentRole === 'super_admin';
+  let adminSec = document.getElementById('vFoodAdminSec');
+  if (!adminSec) {
+    adminSec = document.createElement('div');
+    adminSec.id = 'vFoodAdminSec';
+    adminSec.style.marginTop = '15px';
+    adminSec.style.padding = '10px';
+    adminSec.style.background = 'var(--bg2)';
+    adminSec.style.borderRadius = '12px';
+    adminSec.style.display = 'flex';
+    adminSec.style.gap = '8px';
+    adminSec.style.justifyContent = 'center';
+    // Insert before the Submit Review button
+    const reviewBtn = document.querySelector('#mFood button');
+    if(reviewBtn) reviewBtn.parentNode.insertBefore(adminSec, reviewBtn);
+  }
+  
+  if (isCaf) {
+    adminSec.style.display = 'flex';
+    adminSec.innerHTML = `
+      <button class="btn rh" style="font-size:12px;padding:6px 12px;background:var(--acc);color:#fff" onclick="closeM('mFood');toggleFoodAvailability('${item.id}', ${item.available !== false})">${item.available !== false ? 'Set Sold Out' : 'Set Available'}</button>
+      <button class="btn rh" style="font-size:12px;padding:6px 12px;border:1px solid var(--bdr)" onclick="closeM('mFood');editFoodItem('${item.id}')">Edit</button>
+      <button class="btn rh" style="font-size:12px;padding:6px 12px;background:var(--red);color:#fff" onclick="closeM('mFood');deleteFoodItem('${item.id}')">Delete</button>
+    `;
+  } else {
+    if (adminSec) adminSec.style.display = 'none';
+  }
+
   openM('mFood');
 }
 
@@ -1832,12 +1864,50 @@ function renderAnonAsk() {
   if(items.length===0){ c.innerHTML='<div style="text-align:center;padding:30px;color:var(--mut);">No questions yet.</div>'; return; }
   
   const parents = items.filter(i => !i.parentId);
-  const replies = items.filter(i => i.parentId);
+
+  function countAllReplies(parentId) {
+    const children = items.filter(r => r.parentId === parentId);
+    return children.length + children.reduce((sum, r) => sum + countAllReplies(r.id), 0);
+  }
+
+  function buildReplies(parentId, depth = 0) {
+    const children = items.filter(r => r.parentId === parentId);
+    if (!children.length) return '';
+    
+    children.sort((a,b) => {
+      const t1 = a.createdAt ? a.createdAt.toMillis() : Date.now();
+      const t2 = b.createdAt ? b.createdAt.toMillis() : Date.now();
+      return t1 - t2;
+    });
+
+    return children.map(r => {
+      const rTime = r.createdAt ? new Date(r.createdAt.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+      const childHtml = buildReplies(r.id, depth + 1);
+      
+      return `
+        <div class="ac ac-reply" style="margin-bottom:16px; ${depth > 0 ? 'margin-left: 24px; border-left: 2px solid var(--border); padding-left: 12px !important; margin-top: 8px;' : ''}">
+          ${depth === 0 ? '<div class="reply-branch" style="height: 100%; border-left: 2px solid var(--border); left: -20px; top: -10px;"></div>' : ''}
+          <div class="ach">
+            <div class="aav" style="width:24px;height:24px;background:var(--acc2);color:#000"><span class="ms" style="font-size:14px">${r.avatar||'face'}</span></div>
+            <div class="aun" style="font-size:12px">@${r.alias}</div>
+            <div class="atm" style="font-size:10px">${rTime}</div>
+          </div>
+          <div class="aq" style="font-size:13px;margin-top:4px">${r.content}</div>
+          <div style="display:flex;gap:16px;margin-top:8px;align-items:center">
+            <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();upvoteAnon('${r.id}', ${r.upvotes||0})">thumb_up</div>
+            <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();reportAnonPost('${r.id}')" title="Report">flag</div>
+            <div style="font-size:11px;font-weight:700;color:var(--mut);cursor:pointer" onclick="setReplyMode('${r.id}', '${r.alias}')">Reply</div>
+            ${(currentRole && currentRole !== 'student') ? `<button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:4px 8px;font-size:10px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${r.id}" onclick="handleDelete(this, event)">Delete</button>` : ''}
+          </div>
+          ${childHtml ? `<div style="margin-top:12px">${childHtml}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
 
   c.innerHTML = parents.map(item => {
     const time = item.createdAt ? new Date(item.createdAt.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
-    const itemReplies = replies.filter(r => r.parentId === item.id);
-    const replyCount = itemReplies.length;
+    const replyCount = countAllReplies(item.id);
     const isExpanded = openedReplyIds.has(item.id);
 
     return `
@@ -1856,7 +1926,7 @@ function renderAnonAsk() {
           </div>
           <div style="cursor:pointer;font-size:16px;color:var(--mut)" class="ms" onclick="event.stopPropagation();reportAnonPost('${item.id}')" title="Report">flag</div>
           <div style="font-size:12px;font-weight:700;color:var(--text);cursor:pointer" onclick="setReplyMode('${item.id}', '${item.alias}')">Reply</div>
-          <button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:6px 12px;font-size:11px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${item.id}" onclick="handleDelete(this, event)">Delete</button>
+          ${(currentRole && currentRole !== 'student') ? `<button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:6px 12px;font-size:11px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${item.id}" onclick="handleDelete(this, event)">Delete</button>` : ''}
         </div>
         
         ${replyCount > 0 ? `
@@ -1864,26 +1934,7 @@ function renderAnonAsk() {
             <i class="ms" style="font-size:14px">${isExpanded?'expand_less':'expand_more'}</i> ${isExpanded ? 'Hide replies' : `View ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
           </div>
           <div class="reply-container ${isExpanded?'open':''}" id="replies-${item.id}">
-            ${itemReplies.map(r => {
-              const rTime = r.createdAt ? new Date(r.createdAt.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
-              return `
-                <div class="ac ac-reply" style="margin-bottom:16px">
-                  <div class="reply-branch" style="height: 100%; border-left: 2px solid var(--border); left: -20px; top: -10px;"></div>
-                  <div class="ach">
-                    <div class="aav" style="width:24px;height:24px;background:var(--acc2);color:#000"><span class="ms" style="font-size:14px">${r.avatar||'face'}</span></div>
-                    <div class="aun" style="font-size:12px">@${r.alias}</div>
-                    <div class="atm" style="font-size:10px">${rTime}</div>
-                  </div>
-                  <div class="aq" style="font-size:13px;margin-top:4px">${r.content}</div>
-                  <div style="display:flex;gap:16px;margin-top:8px;align-items:center">
-                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();upvoteAnon('${r.id}', ${r.upvotes||0})">thumb_up</div>
-                    <div class="ms" style="font-size:14px;color:var(--mut);cursor:pointer" onclick="event.stopPropagation();reportAnonPost('${r.id}')" title="Report">flag</div>
-                    <div style="font-size:11px;font-weight:700;color:var(--mut);cursor:pointer">Reply</div>
-                    <button class="btn" style="background:rgba(231,76,60,0.1);color:var(--red);padding:4px 8px;font-size:10px;font-weight:700;margin-left:auto;border:1px solid var(--red);z-index:10" data-id="${r.id}" onclick="handleDelete(this, event)">Delete</button>
-                  </div>
-                </div>
-              `;
-            }).join('')}
+            ${buildReplies(item.id)}
           </div>
         ` : ''}
       </div>
@@ -1929,16 +1980,18 @@ async function deleteAnonItem(id) {
     btn.disabled = true;
     btn.textContent = "Deleting...";
     try {
-      // 1. Delete the main post
-      await db.collection('anon_ask').doc(id).delete();
+      const batch = db.batch();
       
-      // 2. Find and delete replies
-      const repliesSnap = await db.collection('anon_ask').where('parentId', '==', id).get();
-      if (!repliesSnap.empty) {
-        const batch = db.batch();
-        repliesSnap.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
+      async function deleteRecursive(docId) {
+        batch.delete(db.collection('anon_ask').doc(docId));
+        const snap = await db.collection('anon_ask').where('parentId', '==', docId).get();
+        for (let i = 0; i < snap.docs.length; i++) {
+          await deleteRecursive(snap.docs[i].id);
+        }
       }
+      
+      await deleteRecursive(id);
+      await batch.commit();
       
       toast('🗑️','Post deleted successfully');
       closeM('mConfirm');

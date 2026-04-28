@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Student</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <h1>Creating Student User...</h1>
+  <div id="status">Starting...</div>
+  <script>
+    const email = 'student@campus.local';
+    const pass = 'student123';
+
+    async function createStudent() {
+      try {
+        let user;
+        try {
+          const res = await auth.createUserWithEmailAndPassword(email, pass);
+          user = res.user;
+          document.getElementById('status').innerText = 'Auth created. UID: ' + user.uid;
+        } catch(e) {
+          if (e.code === 'auth/email-already-in-use') {
+            const res = await auth.signInWithEmailAndPassword(email, pass);
+            user = res.user;
+            document.getElementById('status').innerText = 'Auth already exists. Logged in UID: ' + user.uid;
+          } else {
+            throw e;
+          }
+        }
+        
+        const docRef = db.collection('user').doc(user.uid);
+        await docRef.set({
+          email: email,
+          role: 'student',
+          name: 'Normal Student',
+          rollNo: 'STUDENT001',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('status').innerText = 'Done! Created user with student role.';
+      } catch (e) {
+        console.error(e);
+        document.getElementById('status').innerText = 'Error: ' + e.message;
+      }
+    }
+
+    auth.onAuthStateChanged(user => {
+      createStudent();
+    });
+  </script>
+</body>
+</html>
